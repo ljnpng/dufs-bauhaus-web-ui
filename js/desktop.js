@@ -224,47 +224,6 @@ function renderSortHeader(label, field, query) {
   return th;
 }
 
-function renderSidebar(data, context) {
-  const aside = create("aside", "desktop-sidebar");
-
-  const brand = create("div", "sidebar-brand");
-  const mark = create("span", "sidebar-brand__mark");
-  mark.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 4; i += 1) {
-    mark.append(create("span"));
-  }
-  brand.append(mark, create("span", "sidebar-brand__name", "dufs"));
-  aside.append(brand);
-
-  const nav = create("nav", "sidebar-nav");
-  nav.setAttribute("aria-label", "Directories");
-  nav.append(create("p", "sidebar-nav__heading", "Directories"));
-
-  const prefix = uriRoot(data);
-  const home = create("a", "sidebar-link");
-  home.href = prefix;
-  home.append(createIcon("home"), create("span", "sidebar-link__label", "Home"));
-  if (data.href === "/" || data.href === "") {
-    home.setAttribute("aria-current", "page");
-  }
-  nav.append(home);
-
-  const directories = (data.paths || []).filter(isDirectory);
-  directories.forEach((item) => {
-    const link = create("a", "sidebar-link");
-    link.href = joinEntryUrl(item.name, { directory: true });
-    link.append(createIcon("folder"), create("span", "sidebar-link__label truncate", item.name));
-    nav.append(link);
-  });
-  aside.append(nav);
-
-  const storage = create("div", "storage");
-  storage.append(create("div", "storage__label", "Storage"), create("div", "storage__value", "Storage unavailable"));
-  aside.append(storage);
-
-  return aside;
-}
-
 function renderToolbar(data, query, context) {
   const caps = context.capabilities;
   const toolbar = create("div", "desktop-toolbar");
@@ -652,7 +611,6 @@ export function renderDesktopIndex(root, context) {
 
   const { data, query } = context;
   const shell = create("div", "desktop-shell");
-  shell.append(renderSidebar(data, context));
 
   const main = create("div", "desktop-main");
   main.append(renderToolbar(data, query, context));
