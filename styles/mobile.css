@@ -407,77 +407,30 @@
   }
 }
 
-/* -------------------------------------------------- topbar add (+) menu */
+/* --------------------------------------------- topbar traffic dots menu */
 
-.mobile-add {
+.mobile-traffic-dots {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: var(--size-fab);
-  height: var(--size-fab);
-  color: var(--color-text);
-  background: var(--color-bauhaus-yellow);
-  border: 0;
+  gap: var(--space-1);
+}
+
+.mobile-traffic-dots span {
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: var(--radius-round);
-  box-shadow: var(--shadow-menu);
-  cursor: pointer;
-  transition:
-    background-color var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease);
 }
 
-.mobile-add .icon {
-  width: var(--icon-size-file);
-  height: var(--icon-size-file);
-  transition: transform var(--motion-fast) var(--motion-ease);
+.mobile-traffic-dots span:nth-child(1) {
+  background: var(--color-bauhaus-red);
 }
 
-.mobile-add:hover {
-  transform: scale(1.04);
+.mobile-traffic-dots span:nth-child(2) {
+  background: var(--color-bauhaus-yellow);
 }
 
-.mobile-add:active {
-  transform: scale(0.94);
-}
-
-.mobile-add[aria-expanded="true"] .icon {
-  transform: rotate(45deg);
-}
-
-.mobile-add-menu {
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  right: 0;
-  z-index: var(--z-fab);
-  display: flex;
-  flex-direction: column;
-  width: min(15rem, calc(100vw - var(--space-8)));
-  padding: var(--space-1);
-  background: var(--color-surface);
-  border: var(--border-default);
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-menu);
-  animation: mobile-add-in var(--motion-fast) var(--motion-ease);
-}
-
-.mobile-add-menu[hidden] {
-  display: none;
-}
-
-.mobile-add-menu .ui-menu-item {
-  min-height: var(--density-row-mobile);
-}
-
-@keyframes mobile-add-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.mobile-traffic-dots span:nth-child(3) {
+  background: var(--color-primary);
 }
 
 /* Toasts no longer clear a bottom nav; keep them just above the viewport edge. */
@@ -492,9 +445,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-row,
-  .mobile-add,
-  .mobile-add .icon,
-  .mobile-add-menu,
   .mobile-search__field {
     animation-duration: 0ms !important;
     transition-duration: 0ms !important;
@@ -505,11 +455,6 @@
   .mobile-search__clear:active,
   .mobile-row__main:active,
   .mobile-row__more:active {
-    transform: none;
-  }
-
-  .mobile-add:hover,
-  .mobile-add:active {
     transform: none;
   }
 }

@@ -378,35 +378,40 @@ function renderSearch(query) {
   return form;
 }
 
-function openGlobalMenu(anchor, context, searchInput) {
+function openGlobalMenu(anchor, context, pickFiles) {
   const caps = context.capabilities;
   const data = context.data;
-  const items = [
-    { id: 'home', label: 'Home', icon: 'home', run: () => navigate(rootHref(data)) },
-    {
-      id: 'back',
-      label: 'Back',
-      icon: 'back',
-      run: () => {
-        if (window.history.length > 1) window.history.back();
-      },
-    },
-    { id: 'refresh', label: 'Refresh', icon: 'refresh', run: () => window.location.reload() },
-  ];
-  if (caps.search && searchInput) {
-    items.push({ id: 'search', label: 'Search', icon: 'search', run: () => searchInput.focus() });
+  const items = [];
+  if (caps.upload && typeof pickFiles === 'function') {
+    items.push({ id: 'upload', label: 'Upload', icon: 'upload', run: () => pickFiles() });
   }
-  if (caps.login) {
+  if (caps.create) {
     items.push({
-      id: 'login',
-      label: 'Sign in',
-      icon: 'login',
-      run: async () => {
-        await api.checkAuth(true);
-        window.location.reload();
-      },
+      id: 'folder',
+      label: 'New folder',
+      icon: 'folder-plus',
+      run: () => runCreateFolder(context),
+    });
+    items.push({
+      id: 'file',
+      label: 'New file',
+      icon: 'file-plus',
+      run: () => runCreateFile(context),
     });
   }
+  if (caps.login || caps.logout) {
+    if (items.length) items.push({ separator: true });
+    if (caps.login) {
+      items.push({
+        id: 'login',
+        label: 'Sign in',
+        icon: 'login',
+        run: async () => {
+          await api.checkAuth(true);
+          window.location.reload();
+        },
+      });
+    }
   if (caps.logout) {
     items.push({
       id: 'logout',
@@ -422,66 +427,15 @@ function openGlobalMenu(anchor, context, searchInput) {
       },
     });
   }
+  }
   context.ui.menu(anchor, items);
 }
 
-function addMenuItem(id, label, icon, run) {
-  const button = create('button', 'ui-menu-item');
-  button.type = 'button';
-  button.setAttribute('role', 'menuitem');
-  button.dataset.addAction = id;
-  button.append(createIcon(icon), create('span', 'ui-menu-label', label));
-  button.addEventListener('click', () => run());
-  return button;
-}
-
-function buildTopAdd(context, onPickFiles) {
-  const button = create('button', 'mobile-add');
-  button.type = 'button';
-  button.setAttribute('aria-label', 'Add');
-  button.setAttribute('aria-haspopup', 'menu');
-  button.setAttribute('aria-expanded', 'false');
-  button.append(createIcon('add'));
-
-  const menu = create('div', 'mobile-add-menu');
-  menu.setAttribute('role', 'menu');
-  menu.hidden = true;
-
-  const actions = [];
-  if (context.capabilities.upload) {
-    actions.push(addMenuItem('upload', 'Upload', 'upload', onPickFiles));
-  }
-  if (context.capabilities.create) {
-    actions.push(addMenuItem('folder', 'New folder', 'folder-plus', () => runCreateFolder(context)));
-    actions.push(addMenuItem('file', 'New file', 'file-plus', () => runCreateFile(context)));
-  }
-  if (!actions.length) return null;
-  actions.forEach((action) => menu.append(action));
-
-  let open = false;
-  function setOpen(next) {
-    open = next;
-    button.setAttribute('aria-expanded', String(open));
-    menu.hidden = !open;
-  }
-  button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    setOpen(!open);
-  });
-  menu.addEventListener('click', () => setOpen(false));
-  document.addEventListener('pointerdown', (event) => {
-    if (!open) return;
-    if (!menu.contains(event.target) && !button.contains(event.target)) setOpen(false);
-  });
-  document.addEventListener('keydown', (event) => {
-    if (open && event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
-      button.focus();
-    }
-  });
-
-  return { button, menu };
+function createTrafficDots() {
+  const dots = create('span', 'mobile-traffic-dots');
+  dots.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 3; i += 1) dots.append(create('span'));
+  return dots;
 }
 
 export function renderMobileIndex(root, context) {
@@ -518,28 +472,21 @@ export function renderMobileIndex(root, context) {
   });
   const pickFiles = () => fileInput.click();
 
-  const topAdd = capabilities.upload ? buildTopAdd(context, pickFiles) : null;
-
-  let searchInput = null;
   const menuButton = create('button', 'mobile-iconbtn');
   menuButton.type = 'button';
   menuButton.setAttribute('aria-label', 'Open menu');
   menuButton.setAttribute('aria-haspopup', 'menu');
-  menuButton.append(createIcon('more'));
-  menuButton.addEventListener('click', () => openGlobalMenu(menuButton, context, searchInput));
+  menuButton.append(createTrafficDots());
+  menuButton.addEventListener('click', () => openGlobalMenu(menuButton, context, pickFiles));
 
   const topActions = create('div', 'mobile-topbar__actions');
-  if (topAdd) topActions.append(topAdd.button);
   topActions.append(menuButton);
-  if (topAdd) topActions.append(topAdd.menu);
 
   topbar.append(brand, topActions);
   header.append(topbar, renderBreadcrumb(data));
 
   if (capabilities.search) {
-    const search = renderSearch(query);
-    searchInput = search.querySelector('input');
-    header.append(search);
+    header.append(renderSearch(query));
   }
   shell.append(header);
 
