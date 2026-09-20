@@ -425,37 +425,37 @@ function openGlobalMenu(anchor, context, searchInput) {
   context.ui.menu(anchor, items);
 }
 
-function fabMenuItem(id, label, icon, run) {
+function addMenuItem(id, label, icon, run) {
   const button = create('button', 'ui-menu-item');
   button.type = 'button';
   button.setAttribute('role', 'menuitem');
-  button.dataset.fabAction = id;
+  button.dataset.addAction = id;
   button.append(createIcon(icon), create('span', 'ui-menu-label', label));
   button.addEventListener('click', () => run());
   return button;
 }
 
-function buildFab(context, onPickFiles) {
-  const wrap = create('div', 'mobile-bottom-nav__slot');
-  const button = create('button', 'mobile-fab');
+function buildTopAdd(context, onPickFiles) {
+  const button = create('button', 'mobile-add');
   button.type = 'button';
   button.setAttribute('aria-label', 'Add');
   button.setAttribute('aria-haspopup', 'menu');
   button.setAttribute('aria-expanded', 'false');
   button.append(createIcon('add'));
 
-  const menu = create('div', 'mobile-fab-menu');
+  const menu = create('div', 'mobile-add-menu');
   menu.setAttribute('role', 'menu');
   menu.hidden = true;
 
   const actions = [];
   if (context.capabilities.upload) {
-    actions.push(fabMenuItem('upload', 'Upload', 'upload', onPickFiles));
+    actions.push(addMenuItem('upload', 'Upload', 'upload', onPickFiles));
   }
   if (context.capabilities.create) {
-    actions.push(fabMenuItem('folder', 'New folder', 'folder-plus', () => runCreateFolder(context)));
-    actions.push(fabMenuItem('file', 'New file', 'file-plus', () => runCreateFile(context)));
+    actions.push(addMenuItem('folder', 'New folder', 'folder-plus', () => runCreateFolder(context)));
+    actions.push(addMenuItem('file', 'New file', 'file-plus', () => runCreateFile(context)));
   }
+  if (!actions.length) return null;
   actions.forEach((action) => menu.append(action));
 
   let open = false;
@@ -481,31 +481,7 @@ function buildFab(context, onPickFiles) {
     }
   });
 
-  wrap.append(button);
-  return { wrap, button, menu };
-}
-
-function buildBottomNav(context, onMore, fab) {
-  const nav = create('nav', 'mobile-bottom-nav');
-  nav.setAttribute('aria-label', 'Primary');
-
-  const files = create('a', 'mobile-bottom-nav__item is-active');
-  files.href = baseUrl();
-  files.setAttribute('aria-current', 'page');
-  files.append(createIcon('folder'), create('span', null, 'Files'));
-  nav.append(files);
-
-  const center = fab ? fab.wrap : create('div', 'mobile-bottom-nav__slot');
-  nav.append(center);
-
-  const more = create('button', 'mobile-bottom-nav__item');
-  more.type = 'button';
-  more.setAttribute('aria-haspopup', 'menu');
-  more.append(createIcon('more'), create('span', null, 'More'));
-  more.addEventListener('click', () => onMore(more));
-  nav.append(more);
-
-  return nav;
+  return { button, menu };
 }
 
 export function renderMobileIndex(root, context) {
@@ -542,7 +518,7 @@ export function renderMobileIndex(root, context) {
   });
   const pickFiles = () => fileInput.click();
 
-  const fab = capabilities.upload ? buildFab(context, pickFiles) : null;
+  const topAdd = capabilities.upload ? buildTopAdd(context, pickFiles) : null;
 
   let searchInput = null;
   const menuButton = create('button', 'mobile-iconbtn');
@@ -552,7 +528,12 @@ export function renderMobileIndex(root, context) {
   menuButton.append(createIcon('more'));
   menuButton.addEventListener('click', () => openGlobalMenu(menuButton, context, searchInput));
 
-  topbar.append(brand, menuButton);
+  const topActions = create('div', 'mobile-topbar__actions');
+  if (topAdd) topActions.append(topAdd.button);
+  topActions.append(menuButton);
+  if (topAdd) topActions.append(topAdd.menu);
+
+  topbar.append(brand, topActions);
   header.append(topbar, renderBreadcrumb(data));
 
   if (capabilities.search) {
@@ -587,8 +568,6 @@ export function renderMobileIndex(root, context) {
     shell.append(list);
   }
 
-  shell.append(buildBottomNav(context, (anchor) => openGlobalMenu(anchor, context, searchInput), fab));
-  if (fab) shell.append(fab.menu);
   shell.append(fileInput);
   root.append(shell);
 }

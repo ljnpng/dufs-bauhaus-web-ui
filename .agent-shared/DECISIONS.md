@@ -17,11 +17,11 @@ favicon.ico
 styles/tokens.css          全局 token
 styles/base.css            reset、可访问性、共享组件
 styles/desktop.css         >= 640px；桌面表格（单栏全宽，无侧栏）
-styles/mobile.css          < 640px；列表、FAB、bottom nav
+styles/mobile.css          < 640px；列表、顶栏加号菜单
 styles/overlays.css        menu、dialog、toast、上传状态、empty state
 js/core.js                 DATA、URL、格式化、权限、API、上传队列
 js/desktop.js              desktop/table/sidebar/toolbar
-js/mobile.js               mobile/list/FAB/bottom nav
+js/mobile.js               mobile/list/topbar add menu
 js/overlays.js             menu/dialog/empty/upload/editor state
 icons/actions.svg          Lucide 风格 symbol sprite
 icons/folder-*.svg         empty/non-empty/hidden variants
