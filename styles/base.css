@@ -1,0 +1,439 @@
+/* Shared reset, accessibility and cross-module components. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  line-height: var(--line-height-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+figure {
+  margin: 0;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: var(--border-focus);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Accessibility helpers */
+
+.visually-hidden,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  border: var(--border-default);
+  box-shadow: var(--shadow-menu);
+  transform: translateY(-200%);
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Icons */
+
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon--sm {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+.icon--file {
+  width: var(--icon-size-file);
+  height: var(--icon-size-file);
+}
+
+/* Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--size-control);
+  padding: 0 var(--space-3);
+  border: var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  transition:
+    background var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--color-hover);
+  border-color: var(--color-disabled);
+}
+
+.btn--primary {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.btn--primary:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.btn--danger {
+  color: var(--color-danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.btn:disabled {
+  color: var(--color-disabled);
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  transition:
+    background var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--color-hover);
+  border-color: var(--color-disabled);
+  color: var(--color-text);
+}
+
+.icon-btn:disabled {
+  color: var(--color-disabled);
+  cursor: not-allowed;
+}
+
+.icon-btn--plain {
+  border-color: transparent;
+  background: transparent;
+}
+
+.icon-btn--plain:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-hover);
+}
+
+/* Form fields */
+
+.field-input {
+  width: 100%;
+  min-height: var(--size-control);
+  padding: 0 var(--space-3);
+  border: var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.field-input:focus-visible {
+  outline: var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* Badges and status */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-round);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+}
+
+.badge--neutral {
+  background: var(--color-hover);
+  color: var(--color-text-muted);
+}
+
+.status-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-round);
+  flex: 0 0 auto;
+}
+
+.status-dot--success {
+  background: var(--color-success);
+}
+
+.status-dot--danger {
+  background: var(--color-danger);
+}
+
+/* Text truncation */
+
+.truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive view containers. Views own their internal layout; this module
+   owns which container is mounted so CSS breakpoints never rebuild DOM. */
+
+#app > #desktop-view {
+  display: none;
+}
+
+#app > #mobile-view {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  #app > #desktop-view {
+    display: block;
+  }
+
+  #app > #mobile-view {
+    display: none;
+  }
+}
+
+/* Editor shell is shared by Edit and View kinds and across breakpoints. */
+
+body[data-mode="editor"] #app > #desktop-view {
+  display: block;
+}
+
+body[data-mode="editor"] #app > #mobile-view {
+  display: none;
+}
+
+/* Shared editor shell (used by desktop.js renderEditor) */
+
+.editor-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+.editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--size-toolbar);
+  padding: 0 var(--page-gutter-mobile);
+  border-bottom: var(--border-default);
+  background: var(--color-surface);
+}
+
+@media (min-width: 640px) {
+  .editor-toolbar {
+    padding: 0 var(--page-gutter-desktop);
+  }
+}
+
+.editor-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+}
+
+.editor-body {
+  flex: 1 1 auto;
+  padding: var(--content-gap) var(--page-gutter-mobile) var(--space-12);
+}
+
+@media (min-width: 640px) {
+  .editor-body {
+    padding: var(--content-gap) var(--page-gutter-desktop) var(--space-12);
+  }
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 60vh;
+  padding: var(--space-4);
+  border: var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-ui);
+  line-height: var(--line-height-ui);
+  resize: vertical;
+  tab-size: 4;
+}
+
+.editor-preview {
+  width: 100%;
+  height: 72vh;
+  border: var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.editor-message {
+  display: flex;
+  max-width: 34rem;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.editor-message__title {
+  font-size: var(--font-size-section);
+  font-weight: var(--font-weight-semibold);
+}
+
+.editor-message__text {
+  color: var(--color-text-muted);
+}
+
+/* Fatal boot error (no UI services available) */
+
+.fatal {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.fatal__panel {
+  max-width: var(--size-dialog-max);
+  padding: var(--space-6);
+  border: var(--border-default);
+  border-top: var(--border-selected);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-dialog);
+}
+
+.fatal__title {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-section);
+  font-weight: var(--font-weight-semibold);
+}
+
+.fatal__text {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  word-break: break-word;
+}

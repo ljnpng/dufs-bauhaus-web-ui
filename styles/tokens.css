@@ -1,0 +1,109 @@
+:root {
+  /* 1. Color */
+  --color-bg: #faf8f5;
+  --color-surface: #ffffff;
+  --color-text: #14213d;
+  --color-text-muted: #687280;
+  --color-border: #e5e7eb;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #eff6ff;
+  --color-bauhaus-red: #ef3340;
+  --color-bauhaus-yellow: #f5b82e;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-hover: #f3f4f6;
+  --color-disabled: #9ca3af;
+  --color-backdrop: rgba(20, 33, 61, 0.36);
+
+  /* 2. Typography */
+  --font-ui: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --font-size-caption: 0.75rem;
+  --font-size-ui: 0.875rem;
+  --font-size-mobile: 1rem;
+  --font-size-section: 1.25rem;
+  --font-size-page: 1.75rem;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.25;
+  --line-height-ui: 1.5;
+
+  /* 3. Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --page-gutter-mobile: var(--space-4);
+  --page-gutter-desktop: var(--space-8);
+  --content-gap: var(--space-6);
+  --table-cell-inline: var(--space-4);
+
+  /* 4. Size / layout */
+  --size-control: 2.25rem;
+  --size-primary: 2.5rem;
+  --size-toolbar: 3.5rem;
+  --size-sidebar: 14.5rem;
+  --size-bottom-nav: 3.75rem;
+  --size-fab: 3rem;
+  --size-dialog-max: 30rem;
+  --size-search-max: 20rem;
+
+  /* 5. Radius */
+  --radius-sm: 0.25rem;
+  --radius-control: 0.375rem;
+  --radius-panel: 0.5rem;
+  --radius-round: 999px;
+
+  /* 6. Border */
+  --border-width: 1px;
+  --border-default: var(--border-width) solid var(--color-border);
+  --border-focus: 2px solid var(--color-primary);
+  --border-selected: 3px solid var(--color-primary);
+
+  /* 7. Shadow */
+  --shadow-panel: 0 1px 3px rgba(20, 33, 61, 0.08);
+  --shadow-menu: 0 8px 24px rgba(20, 33, 61, 0.14);
+  --shadow-dialog: 0 16px 40px rgba(20, 33, 61, 0.18);
+
+  /* 8. Icon */
+  --icon-size-sm: 1rem;
+  --icon-size: 1.125rem;
+  --icon-size-mobile: 1.25rem;
+  --icon-size-file: 1.5rem;
+  --icon-size-grid: 3.5rem;
+  --icon-box: 1.5rem;
+  --icon-stroke: 1.875;
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-panel: 180ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Z-index */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-menu: 30;
+  --z-fab: 40;
+  --z-backdrop: 50;
+  --z-dialog: 60;
+  --z-toast: 70;
+
+  /* Density */
+  --density-row-desktop: 2.75rem;
+  --density-row-mobile: 3.25rem;
+  --density-hit-target: 2.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-panel: 0ms;
+  }
+}
