@@ -544,6 +544,55 @@ body.ui-no-scroll {
   color: var(--color-danger);
 }
 
+/* -------------------------------------------------- mobile touch tuning
+   Scoped to the mobile breakpoint so the shared desktop chrome is unchanged. */
+
+@media (max-width: 639px) {
+  .ui-btn {
+    min-height: calc(var(--density-hit-target) + var(--space-1));
+  }
+
+  .ui-btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .ui-btn:not(.ui-btn--primary):not(.ui-btn--danger):active:not(:disabled) {
+    background: var(--color-border);
+  }
+
+  .ui-btn--primary:active:not(:disabled) {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .ui-menu-item {
+    min-height: calc(var(--density-hit-target) + var(--space-1));
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .ui-menu-item:active:not(:disabled) {
+    background: var(--color-border);
+    transform: scale(0.98);
+  }
+
+  .ui-menu-item--danger {
+    color: var(--color-danger);
+  }
+
+  .ui-menu-item--danger .icon {
+    color: var(--color-danger);
+  }
+
+  .ui-menu-item--danger:active:not(:disabled) {
+    background: var(--color-danger-soft);
+  }
+
+  .ui-dialog__footer .ui-btn {
+    min-height: var(--size-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 /* -------------------------------------------------------- reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
@@ -554,5 +603,10 @@ body.ui-no-scroll {
   .upload-progress__bar {
     animation-duration: 0ms !important;
     transition-duration: 0ms !important;
+  }
+
+  .ui-btn:active,
+  .ui-menu-item:active {
+    transform: none;
   }
 }
