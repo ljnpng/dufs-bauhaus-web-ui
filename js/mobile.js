@@ -450,10 +450,16 @@ export function renderMobileIndex(root, context) {
   const topbar = create('div', 'mobile-topbar');
   const brand = create('a', 'mobile-brand');
   brand.href = rootHref(data);
-  const mark = create('span', 'mobile-brand__mark');
-  mark.setAttribute('aria-hidden', 'true');
-  for (let i = 0; i < 4; i += 1) mark.append(create('span'));
-  brand.append(mark, create('span', 'mobile-brand__name', 'dufs'));
+  brand.setAttribute('aria-label', 'dufs');
+  const mark = document.createElement('img');
+  mark.className = 'mobile-brand__mark';
+  mark.src = assetUrl('brand.svg');
+  mark.alt = '';
+  mark.decoding = 'async';
+  mark.addEventListener('error', () => {
+    mark.style.visibility = 'hidden';
+  });
+  brand.append(mark);
 
   const fileInput = create('input', 'visually-hidden');
   fileInput.type = 'file';

@@ -47,38 +47,10 @@
 }
 
 .mobile-brand__mark {
-  display: grid;
+  display: block;
   flex: none;
-  width: var(--icon-box);
-  height: var(--icon-box);
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: var(--border-width);
-}
-
-.mobile-brand__mark span:nth-child(1) {
-  background: var(--color-bauhaus-red);
-}
-
-.mobile-brand__mark span:nth-child(2) {
-  background: var(--color-bauhaus-yellow);
-  border-radius: var(--radius-round);
-}
-
-.mobile-brand__mark span:nth-child(3) {
-  background: var(--color-primary);
-  border-radius: var(--radius-sm) 0 0 0;
-}
-
-.mobile-brand__mark span:nth-child(4) {
-  background: var(--color-text);
-}
-
-.mobile-brand__name {
-  font-size: var(--font-size-section);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  letter-spacing: -0.01em;
+  width: auto;
+  height: var(--size-brand);
 }
 
 .mobile-iconbtn {
