@@ -12,6 +12,12 @@ import {
 } from './core.js?ui=0.1.0';
 import { createIcon, ensureSprite } from './overlays.js?ui=0.1.0';
 
+// iOS Safari only paints :active while a touch listener is attached to the
+// document, so register a no-op one to make the mobile pressed states fire.
+if (typeof document !== 'undefined') {
+  document.addEventListener('touchstart', () => {}, { passive: true });
+}
+
 function create(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
