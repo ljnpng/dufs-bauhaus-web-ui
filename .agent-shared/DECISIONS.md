@@ -16,7 +16,7 @@ app.js                     ES module 入口；选择 Index/Edit/View 与响应�
 favicon.ico
 styles/tokens.css          全局 token
 styles/base.css            reset、可访问性、共享组件
-styles/desktop.css         >= 640px；桌面表格，>= 1024px 加侧栏
+styles/desktop.css         >= 640px；桌面表格（单栏全宽，无侧栏）
 styles/mobile.css          < 640px；列表、FAB、bottom nav
 styles/overlays.css        menu、dialog、toast、上传状态、empty state
 js/core.js                 DATA、URL、格式化、权限、API、上传队列
@@ -112,14 +112,14 @@ icons/LICENSE.md           第三方 icon 来源与许可证
 --size-control: 2.25rem;        /* 36px */
 --size-primary: 2.5rem;        /* 40px */
 --size-toolbar: 3.5rem;         /* 56px */
---size-sidebar: 14.5rem;        /* 232px */
+--size-sidebar: 14.5rem;        /* 232px，DEAD：sidebar 已删，无引用，待清理 */
 --size-bottom-nav: 3.75rem;     /* 60px */
 --size-fab: 3rem;               /* 48px */
 --size-dialog-max: 30rem;       /* 480px */
 --size-search-max: 20rem;       /* 320px */
 ```
 
-Breakpoints：mobile `0–639px`；tablet `640–1023px`；desktop `>=1024px`。侧栏只在 desktop 出现；tablet 使用表格但无固定侧栏。
+Breakpoints：mobile `0–639px`；tablet `640–1023px`；desktop `>=1024px`。2026-09-20 用户决定：桌面端 sidebar 整体删除（主界面区本身就是 menu），全宽度单栏；Storage 指示器移到表格下方 36px slim statusbar（>=1024px 显示）。
 
 ### 5. Radius
 
