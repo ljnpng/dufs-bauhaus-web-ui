@@ -428,7 +428,7 @@ function openGlobalMenu(anchor, context, pickFiles) {
     });
   }
   }
-  context.ui.menu(anchor, items);
+  return context.ui.menu(anchor, items);
 }
 
 function createTrafficDots() {
@@ -479,11 +479,25 @@ export function renderMobileIndex(root, context) {
   const pickFiles = () => fileInput.click();
 
   const menuButton = create('button', 'mobile-iconbtn');
+  let globalMenuOpen = false;
   menuButton.type = 'button';
   menuButton.setAttribute('aria-label', 'Open menu');
   menuButton.setAttribute('aria-haspopup', 'menu');
   menuButton.append(createTrafficDots());
-  menuButton.addEventListener('click', () => openGlobalMenu(menuButton, context, pickFiles));
+  menuButton.addEventListener('click', () => {
+    if (globalMenuOpen) {
+      if (ui && typeof ui.closeMenu === 'function') ui.closeMenu();
+      return;
+    }
+
+    const closed = openGlobalMenu(menuButton, context, pickFiles);
+    globalMenuOpen = true;
+    if (closed && typeof closed.finally === 'function') {
+      closed.finally(() => {
+        globalMenuOpen = false;
+      });
+    }
+  });
 
   const topActions = create('div', 'mobile-topbar__actions');
   topActions.append(menuButton);
