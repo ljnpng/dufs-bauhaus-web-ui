@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from './core.js?ui=0.1.0';
-import { createIcon, ensureSprite } from './overlays.js?ui=0.1.0';
+} from './core.js?ui=0.1.3';
+import { createIcon, ensureSprite } from './overlays.js?ui=0.1.3';
 
 // iOS Safari only paints :active while a touch listener is attached to the
 // document, so register a no-op one to make the mobile pressed states fire.
@@ -314,14 +314,22 @@ function renderBreadcrumb(data) {
   const nav = create('nav', 'mobile-breadcrumb');
   nav.setAttribute('aria-label', 'Breadcrumb');
   const prefix = rootHref(data);
+  const segments = String(data.href || '/').split('/').filter(Boolean);
 
-  const home = create('a', 'crumb crumb--home');
-  home.href = prefix;
-  home.setAttribute('aria-label', 'Home');
+  const home = create(
+    segments.length === 0 ? 'span' : 'a',
+    `crumb crumb--home${segments.length === 0 ? ' crumb--home-current' : ''}`,
+  );
+  if (segments.length > 0) {
+    home.href = prefix;
+    home.setAttribute('aria-label', 'Files');
+  } else {
+    home.setAttribute('aria-current', 'page');
+  }
   home.append(createIcon('home'));
+  if (segments.length === 0) home.append(create('span', 'crumb__label', 'Files'));
   nav.append(home);
 
-  const segments = String(data.href || '/').split('/').filter(Boolean);
   let path = prefix;
   segments.forEach((segment, index) => {
     const separator = create('span', 'crumb-sep');
@@ -359,23 +367,76 @@ function renderSearch(query) {
   input.value = query.q || '';
   field.append(createIcon('search'), input);
 
-  const clear = create('button', 'mobile-search__clear');
-  clear.type = 'button';
-  clear.setAttribute('aria-label', 'Clear search');
-  clear.append(createIcon('close'));
-  clear.hidden = !query.q;
-  clear.addEventListener('click', () => navigate(baseUrl()));
-
-  form.append(field, clear);
+  form.append(field);
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const value = input.value.trim();
     navigate(value ? `${baseUrl()}?q=${encodeURIComponent(value)}` : baseUrl());
   });
-  input.addEventListener('input', () => {
-    clear.hidden = input.value.length === 0;
-  });
   return form;
+}
+
+function createSearchControl(query) {
+  const control = create('div', 'mobile-search-control');
+  const search = renderSearch(query);
+  const button = create('button', 'mobile-iconbtn mobile-search-toggle');
+  button.type = 'button';
+  const initiallyOpen = Boolean(query.q);
+  search.hidden = !initiallyOpen;
+  button.setAttribute('aria-label', initiallyOpen ? 'Close search' : 'Open search');
+  button.setAttribute('aria-expanded', String(initiallyOpen));
+  const setIcon = (open) => {
+    button.replaceChildren(createIcon(open ? 'close' : 'search'));
+  };
+  setIcon(initiallyOpen);
+  const input = search.querySelector('input');
+  let collapseTimer = null;
+  const setOpen = (open, focus = false) => {
+    if (collapseTimer) {
+      clearTimeout(collapseTimer);
+      collapseTimer = null;
+    }
+    search.classList.remove('is-collapsing');
+    search.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('aria-label', open ? 'Close search' : 'Open search');
+    setIcon(open);
+    if (focus) input?.focus();
+  };
+  const closeSearch = () => {
+    // If a search filter is active, closing also clears it; otherwise the
+    // user would be left on a filtered list with no visible way to reset.
+    if (query.q) {
+      navigate(baseUrl());
+      return;
+    }
+    // Discard any unsubmitted draft so reopening starts clean.
+    if (input) input.value = '';
+    // Fade the field out first; hide it once the transition finishes.
+    search.classList.add('is-collapsing');
+    collapseTimer = setTimeout(() => {
+      collapseTimer = null;
+      setOpen(false);
+      button.focus();
+    }, 130);
+  };
+
+  button.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') === 'true';
+    if (open) {
+      closeSearch();
+      return;
+    }
+    setOpen(true, true);
+  });
+  input?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    closeSearch();
+  });
+
+  control.append(search, button);
+  return control;
 }
 
 function openGlobalMenu(anchor, context, pickFiles) {
@@ -500,14 +561,12 @@ export function renderMobileIndex(root, context) {
   });
 
   const topActions = create('div', 'mobile-topbar__actions');
+  if (capabilities.search) topActions.append(createSearchControl(query));
   topActions.append(menuButton);
 
   topbar.append(brand, topActions);
   header.append(topbar, renderBreadcrumb(data));
 
-  if (capabilities.search) {
-    header.append(renderSearch(query));
-  }
   shell.append(header);
 
   const paths = data.paths || [];

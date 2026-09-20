@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from "./core.js?ui=0.1.0";
-import { createIcon, renderEmptyState } from "./overlays.js?ui=0.1.0";
+} from "./core.js?ui=0.1.3";
+import { createIcon, renderEmptyState } from "./overlays.js?ui=0.1.3";
 
 const PREVIEW_EXTENSIONS = new Set([
   "pdf",

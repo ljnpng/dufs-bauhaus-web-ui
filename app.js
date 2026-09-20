@@ -4,10 +4,10 @@ import {
   createUploadQueue,
   getQueryState,
   parseIndexData,
-} from "./js/core.js?ui=0.1.0";
-import { renderDesktopIndex, renderEditor } from "./js/desktop.js?ui=0.1.0";
-import { renderMobileIndex } from "./js/mobile.js?ui=0.1.0";
-import { createUiServices } from "./js/overlays.js?ui=0.1.0";
+} from "./js/core.js?ui=0.1.3";
+import { renderDesktopIndex, renderEditor } from "./js/desktop.js?ui=0.1.3";
+import { renderMobileIndex } from "./js/mobile.js?ui=0.1.3";
+import { createUiServices } from "./js/overlays.js?ui=0.1.3";
 
 function renderFatal(message) {
   const mount = document.getElementById("desktop-view") || document.getElementById("app");

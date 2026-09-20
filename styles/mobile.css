@@ -37,6 +37,13 @@
   gap: var(--space-1);
 }
 
+.mobile-search-control {
+  display: flex;
+  flex: 0 1 min(18rem, 58vw);
+  align-items: center;
+  min-width: 0;
+}
+
 .mobile-brand {
   display: inline-flex;
   align-items: center;
@@ -132,6 +139,20 @@
   color: var(--color-primary);
 }
 
+.mobile-breadcrumb .crumb--home-current {
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.mobile-breadcrumb .crumb--home-current .icon {
+  color: var(--color-primary);
+}
+
+.mobile-breadcrumb .crumb__label {
+  font-weight: var(--font-weight-semibold);
+}
+
 .mobile-breadcrumb .crumb--current {
   color: var(--color-text);
   font-weight: var(--font-weight-semibold);
@@ -152,9 +173,27 @@
 
 .mobile-search {
   display: flex;
+  flex: 1;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--page-gutter-mobile) var(--space-3);
+  min-width: 0;
+  animation: mobile-search-in var(--motion-panel) var(--motion-ease);
+}
+
+@keyframes mobile-search-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-2));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mobile-search.is-collapsing {
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 
 .mobile-search__field {
@@ -163,7 +202,7 @@
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  min-height: calc(var(--size-primary) + var(--space-2));
+  min-height: var(--size-primary);
   padding: 0 var(--space-3);
   background: var(--color-bg);
   border: var(--border-default);
@@ -171,6 +210,10 @@
   transition:
     border-color var(--motion-fast) var(--motion-ease),
     box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+.mobile-search[hidden] {
+  display: none;
 }
 
 .mobile-search__field:focus-within {
@@ -198,33 +241,14 @@
   color: var(--color-text-muted);
 }
 
-.mobile-search__clear {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: calc(var(--density-hit-target) + var(--space-1));
-  height: calc(var(--density-hit-target) + var(--space-1));
-  color: var(--color-text-muted);
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius-control);
-  cursor: pointer;
-  transition:
-    background-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease);
+/* Hide the native search-field cancel button: the topbar toggle is the
+   single close control, so the browser must not render a second one. */
+.mobile-search__input::-webkit-search-cancel-button,
+.mobile-search__input::-webkit-search-decoration {
+  display: none;
 }
-
-.mobile-search__clear:hover {
-  color: var(--color-text);
-  background: var(--color-hover);
-}
-
-.mobile-search__clear:active {
-  color: var(--color-text);
-  background: var(--color-border);
-  transform: scale(0.97);
+.mobile-search__input::-ms-clear {
+  display: none;
 }
 
 /* ------------------------------------------------------------------- list */
@@ -417,14 +441,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-row,
-  .mobile-search__field {
+  .mobile-search__field,
+  .mobile-search {
     animation-duration: 0ms !important;
     transition-duration: 0ms !important;
   }
 
   .mobile-iconbtn:active,
   .mobile-breadcrumb a.crumb:active,
-  .mobile-search__clear:active,
   .mobile-row__main:active,
   .mobile-row__more:active {
     transform: none;
