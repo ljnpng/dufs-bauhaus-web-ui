@@ -128,10 +128,19 @@
 
 /* Breadcrumb inside topbar — compact, no extra hit target height */
 
+.mobile-topbar .mobile-breadcrumb {
+  gap: 0;
+}
+
 .mobile-topbar .mobile-breadcrumb .crumb {
   min-height: 0;
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-1) var(--space-1);
   font-size: var(--font-size-caption);
+}
+
+.mobile-topbar .mobile-breadcrumb .crumb-sep .icon {
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .mobile-topbar .mobile-breadcrumb .crumb--current {
