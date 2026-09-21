@@ -383,7 +383,24 @@ function renderSearch(query) {
   input.autocomplete = 'off';
   input.setAttribute('aria-label', 'Search files');
   input.value = query.q || '';
-  field.append(createIcon('search'), input);
+
+  const clear = create('button', 'mobile-search__clear');
+  clear.type = 'button';
+  clear.setAttribute('aria-label', 'Clear search');
+  clear.hidden = !input.value;
+  clear.append(createIcon('close'));
+  clear.addEventListener('click', () => {
+    input.value = '';
+    clear.hidden = true;
+    input.focus();
+    navigate(baseUrl());
+  });
+
+  input.addEventListener('input', () => {
+    clear.hidden = input.value.length === 0;
+  });
+
+  field.append(createIcon('search'), input, clear);
 
   form.append(field);
   form.addEventListener('submit', (event) => {
