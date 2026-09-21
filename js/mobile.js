@@ -347,12 +347,12 @@ function renderBreadcrumb(data) {
   }
 
   visible.forEach((item, index) => {
-    if (index > 0) {
-      const sep = create('span', 'crumb-sep');
-      sep.setAttribute('aria-hidden', 'true');
-      sep.append(createIcon('chevron-right'));
-      nav.append(sep);
-    }
+    // Always prepend a separator — the leading one anchors the breadcrumb
+    // visually to the brand logo (which acts as home).
+    const sep = create('span', 'crumb-sep');
+    sep.setAttribute('aria-hidden', 'true');
+    sep.append(createIcon('chevron-right'));
+    nav.append(sep);
 
     if (item.last) {
       const current = create('span', 'crumb crumb--current', item.label);
