@@ -265,7 +265,8 @@ function buildEmptyState(spec = {}) {
   const canUpload = capabilities == null ? Boolean(onUpload) : Boolean(capabilities.upload);
   const actions = el('div', { class: 'empty-state__actions' });
   if (kind === 'search' && onClearSearch) {
-    actions.appendChild(actionButton('Clear search', 'close', onClearSearch));
+    // Clear search button intentionally omitted — the ✕ inside the search
+    // field is the single clear control; no need to duplicate it here.
   }
   if ((kind === 'empty' || kind === 'pending') && canUpload) {
     if (onUpload) actions.appendChild(actionButton('Upload', 'upload', onUpload, 'primary'));
