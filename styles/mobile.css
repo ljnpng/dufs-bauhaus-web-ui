@@ -52,6 +52,11 @@
   min-width: 0;
   color: var(--color-text);
   text-decoration: none;
+  outline: none;
+}
+
+.mobile-brand:focus-visible {
+  outline: none;
 }
 
 .mobile-brand__mark {
