@@ -123,6 +123,7 @@ async function runMove(item, srcUrl, context) {
     title: 'Rename or move',
     label: 'New path',
     value: itemRootPath(item, context.data),
+    cursorAtEnd: true,
     confirmLabel: 'Move',
   });
   if (input == null || !input.trim()) return;
@@ -623,4 +624,3 @@ export function renderMobileIndex(root, context) {
   if (!refs) return;
   updateMobileContent(refs.contentEl, context, refs);
 }
-    cursorAtEnd: true,

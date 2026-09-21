@@ -480,6 +480,7 @@ async function runMove(item, srcUrl, context) {
     title: "Rename or move",
     label: "New path",
     value: currentPath,
+    cursorAtEnd: true,
     confirmLabel: "Move",
   });
   if (input == null || !input.trim()) {
@@ -785,4 +786,3 @@ async function loadText(textarea, saveButton, url, context) {
     }
   }
 }
-    cursorAtEnd: true,

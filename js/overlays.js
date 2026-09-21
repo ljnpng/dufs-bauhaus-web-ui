@@ -609,6 +609,7 @@ export function createUiServices(root, context) {
       cancelText,
       required = true,
       type = 'text',
+      cursorAtEnd = false,
     } = options;
 
     return new Promise((resolve) => {
@@ -672,6 +673,9 @@ export function createUiServices(root, context) {
         initialFocus: input,
         onDismiss: () => finish(null),
       });
+      if (cursorAtEnd) {
+        requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+      }
     });
   }
 
@@ -891,7 +895,3 @@ export function createUiServices(root, context) {
     closeMenu,
   };
 }
-      cursorAtEnd = false,
-      if (cursorAtEnd) {
-        requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
-      }
