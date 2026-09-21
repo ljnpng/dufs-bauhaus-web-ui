@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from "./core.js?ui=0.1.13";
-import { bauhausLabel, createIcon, renderEmptyState } from "./overlays.js?ui=0.1.13";
+} from "./core.js?ui=0.1.14";
+import { bauhausLabel, createIcon, renderEmptyState } from "./overlays.js?ui=0.1.14";
 
 const PREVIEW_EXTENSIONS = new Set([
   "pdf",
@@ -59,6 +59,8 @@ function entryIcon(item) {
   let base = iconName(item);
   if (isDirectory(item) && (item.name || "").startsWith(".")) {
     base = `${base}-hidden`;
+  } else if ((item.name || "").startsWith(".")) {
+    img.classList.add("entry-icon--hidden");
   }
   img.src = assetUrl(`icons/${base}.svg`);
   img.addEventListener("error", () => {
@@ -156,23 +158,54 @@ function renderBreadcrumb(data) {
   const prefix = uriRoot(data);
   const segments = String(data.href || "/").split("/").filter(Boolean);
 
-  const root = create("a", "breadcrumb__link");
-  root.href = prefix;
-  root.setAttribute("aria-label", "Root");
-  root.append(createIcon("home"));
-  nav.append(root);
+  // No home crumb — the brand mark already links to root, so at root level
+  // the breadcrumb is empty (mirrors the mobile topbar).
+  if (segments.length === 0) return nav;
 
+  const crumbs = [];
   let path = prefix;
   segments.forEach((segment, index) => {
-    nav.append(create("span", "breadcrumb__separator", "/"));
     path += `${encodeURIComponent(segment)}/`;
-    if (index === segments.length - 1) {
-      const current = create("span", "breadcrumb__current", segment);
+    crumbs.push({ label: segment, href: path, last: index === segments.length - 1 });
+  });
+
+  // Deep paths (3+ segments) collapse the middle into a "…" link pointing at
+  // the parent so the trail stays readable without expand state.
+  //   1 segment : current
+  //   2 segments: first > current
+  //   3+ segments: first > … > current
+  let visible;
+  if (crumbs.length <= 2) {
+    visible = crumbs;
+  } else {
+    const parent = crumbs[crumbs.length - 2];
+    visible = [
+      crumbs[0],
+      { label: "\u2026", href: parent.href, ellipsis: true },
+      crumbs[crumbs.length - 1],
+    ];
+  }
+
+  visible.forEach((item) => {
+    // Always prepend a separator — the leading one anchors the trail to the
+    // brand mark that acts as home.
+    const sep = create("span", "breadcrumb__separator");
+    sep.setAttribute("aria-hidden", "true");
+    sep.append(createIcon("chevron-right"));
+    nav.append(sep);
+
+    if (item.last) {
+      const current = create("span", "breadcrumb__current", item.label);
       current.setAttribute("aria-current", "page");
       nav.append(current);
     } else {
-      const link = create("a", "breadcrumb__link", segment);
-      link.href = path;
+      const link = create(
+        "a",
+        item.ellipsis ? "breadcrumb__link breadcrumb__link--ellipsis" : "breadcrumb__link",
+        item.label,
+      );
+      link.href = item.href;
+      if (item.ellipsis) link.setAttribute("aria-label", "Parent folders");
       nav.append(link);
     }
   });
@@ -202,7 +235,7 @@ function renderSearch(data, query) {
   const input = create("input", "field-input");
   input.type = "search";
   input.name = "q";
-  input.placeholder = "Search";
+  input.placeholder = "Search files...";
   input.autocomplete = "off";
   input.setAttribute("aria-label", "Search files");
   input.value = query.q || "";

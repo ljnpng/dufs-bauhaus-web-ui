@@ -329,12 +329,6 @@
   height: var(--icon-size-file);
 }
 
-.mobile-row__icon .entry-icon--hidden {
-  outline: var(--border-default);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
 .mobile-row__badge {
   position: absolute;
   right: calc(-1 * var(--border-width));

@@ -1,4 +1,4 @@
-import { assetUrl } from './core.js?ui=0.1.13';
+import { assetUrl } from './core.js?ui=0.1.14';
 
 const NS = 'http://www.w3.org/2000/svg';
 const FOCUSABLE =

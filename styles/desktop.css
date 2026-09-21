@@ -44,6 +44,12 @@
     height: var(--size-brand);
   }
 
+  .desktop-brand:focus,
+  .desktop-brand:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   .breadcrumb {
     display: flex;
     min-width: 0;
@@ -66,11 +72,25 @@
 
   .breadcrumb__link {
     color: var(--color-text-muted);
+    transition:
+      background-color var(--motion-fast) var(--motion-ease),
+      color var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
   }
 
   .breadcrumb__link:hover {
     background: var(--color-hover);
     color: var(--color-text);
+  }
+
+  .breadcrumb__link:active {
+    background: var(--color-action-active);
+    color: var(--color-text);
+    transform: translateY(var(--motion-press-offset));
+  }
+
+  .breadcrumb__link--ellipsis {
+    letter-spacing: 0.05em;
   }
 
   .breadcrumb__current {
@@ -81,8 +101,15 @@
   }
 
   .breadcrumb__separator {
+    display: inline-flex;
+    align-items: center;
     color: var(--color-disabled);
     user-select: none;
+  }
+
+  .breadcrumb__separator .icon {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
   }
 
   .toolbar-search {
@@ -100,7 +127,7 @@
     min-width: 0;
     min-height: var(--size-control);
     padding: 0 var(--space-1) 0 var(--space-3);
-    background: var(--color-surface);
+    background: var(--color-bg);
     border: var(--border-control);
     border-radius: var(--radius-control);
     transition: border-color var(--motion-fast) var(--motion-ease);
@@ -128,6 +155,15 @@
 
   .toolbar-search__field .field-input:focus-visible {
     outline: none;
+  }
+
+  .toolbar-search__field .field-input::-webkit-search-cancel-button,
+  .toolbar-search__field .field-input::-webkit-search-decoration {
+    display: none;
+  }
+
+  .toolbar-search__field .field-input::-ms-clear {
+    display: none;
   }
 
   .toolbar-search__clear {
@@ -197,6 +233,10 @@
 
   .file-row:hover {
     background: var(--color-hover);
+  }
+
+  .file-row:active {
+    background: var(--color-action-active);
   }
 
   .file-row:focus-within {
@@ -275,6 +315,7 @@
 
   .name-text {
     min-width: 0;
+    font-weight: var(--font-weight-semibold);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -288,5 +329,11 @@
 
   .row-action {
     margin-left: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breadcrumb__link:active {
+    transform: none;
   }
 }

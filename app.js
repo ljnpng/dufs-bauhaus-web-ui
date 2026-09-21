@@ -6,20 +6,20 @@ import {
   fetchDirectory,
   getQueryState,
   parseIndexData,
-} from "./js/core.js?ui=0.1.13";
+} from "./js/core.js?ui=0.1.14";
 import {
   renderDesktopIndex,
   renderDesktopShell,
   renderEditor,
   updateDesktopContent,
   updateDesktopToolbar,
-} from "./js/desktop.js?ui=0.1.13";
+} from "./js/desktop.js?ui=0.1.14";
 import {
   renderMobileIndex,
   renderMobileShell,
   updateMobileContent,
-} from "./js/mobile.js?ui=0.1.13";
-import { createUiServices } from "./js/overlays.js?ui=0.1.13";
+} from "./js/mobile.js?ui=0.1.14";
+import { createUiServices } from "./js/overlays.js?ui=0.1.14";
 
 function renderFatal(message) {
   const mount = document.getElementById("desktop-view") || document.getElementById("app");

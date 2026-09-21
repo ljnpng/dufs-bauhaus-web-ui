@@ -135,6 +135,13 @@ svg {
   height: var(--icon-size-file);
 }
 
+/* Hidden (dot-prefixed) entries get a dotted outline frame. */
+.entry-icon--hidden {
+  outline: var(--border-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* Buttons */
 
 .btn {

@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from './core.js?ui=0.1.13';
-import { createIcon, ensureSprite } from './overlays.js?ui=0.1.13';
+} from './core.js?ui=0.1.14';
+import { createIcon, ensureSprite } from './overlays.js?ui=0.1.14';
 
 // iOS Safari only paints :active while a touch listener is attached to the
 // document, so register a no-op one to make the mobile pressed states fire.
