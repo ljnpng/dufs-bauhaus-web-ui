@@ -606,26 +606,84 @@ function renderEmpty(container, kind, query, context) {
   renderEmptyState(container, spec);
 }
 
-export function renderDesktopIndex(root, context) {
+/**
+ * Build the desktop chrome once. Creates desktop-shell, desktop-main,
+ * renders the full toolbar (breadcrumb + search + actions), and appends
+ * an empty desktop-content container.
+ *
+ * @param {Element} root     – mount point (will be cleared)
+ * @param {object}  context  – { data, query, capabilities, ui, … }
+ * @returns {{ contentEl: Element, toolbarEl: Element }}
+ */
+export function renderDesktopShell(root, context) {
   root.textContent = "";
 
   const { data, query } = context;
   const shell = create("div", "desktop-shell");
-
   const main = create("div", "desktop-main");
-  main.append(renderToolbar(data, query, context));
 
-  const content = create("div", "desktop-content");
+  const toolbarEl = renderToolbar(data, query, context);
+  main.append(toolbarEl);
+
+  const contentEl = create("div", "desktop-content");
+  main.append(contentEl);
+  shell.append(main);
+  root.append(shell);
+
+  return { contentEl, toolbarEl };
+}
+
+/**
+ * Re-render only the file list area. Safe to call on every navigation.
+ *
+ * @param {Element} contentEl – the .desktop-content element from renderDesktopShell
+ * @param {object}  context   – { data, query, … }
+ */
+export function updateDesktopContent(contentEl, context) {
+  contentEl.textContent = "";
+
+  const { data, query } = context;
   const paths = data.paths || [];
   if (paths.length === 0) {
     const variant = query.q ? "search" : data.dir_exists === false ? "pending" : "empty";
-    renderEmpty(content, variant, query, context);
+    renderEmpty(contentEl, variant, query, context);
   } else {
-    content.append(renderTable(data, query, context));
+    contentEl.append(renderTable(data, query, context));
   }
-  main.append(content);
-  shell.append(main);
-  root.append(shell);
+}
+
+/**
+ * Re-render only the dynamic parts of the toolbar:
+ *   – replaces the .breadcrumb element
+ *   – syncs the search input value
+ *
+ * @param {Element} toolbarEl – the .desktop-toolbar element from renderDesktopShell
+ * @param {object}  context   – { data, query, … }
+ */
+export function updateDesktopToolbar(toolbarEl, context) {
+  const { data, query } = context;
+
+  // Replace breadcrumb
+  const oldBreadcrumb = toolbarEl.querySelector(".breadcrumb");
+  const newBreadcrumb = renderBreadcrumb(data);
+  if (oldBreadcrumb) {
+    toolbarEl.replaceChild(newBreadcrumb, oldBreadcrumb);
+  }
+
+  // Sync search input value
+  const searchInput = toolbarEl.querySelector(".toolbar-search .field-input");
+  if (searchInput) {
+    searchInput.value = query.q || "";
+  }
+}
+
+/**
+ * Original entry-point kept for backward compatibility.
+ * Delegates to renderDesktopShell + updateDesktopContent.
+ */
+export function renderDesktopIndex(root, context) {
+  const { contentEl } = renderDesktopShell(root, context);
+  updateDesktopContent(contentEl, context);
 }
 
 export function renderEditor(root, context) {

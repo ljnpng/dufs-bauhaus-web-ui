@@ -1,12 +1,24 @@
 import {
   api,
   capabilities,
+  createRouter,
   createUploadQueue,
+  fetchDirectory,
   getQueryState,
   parseIndexData,
 } from "./js/core.js?ui=0.1.3";
-import { renderDesktopIndex, renderEditor } from "./js/desktop.js?ui=0.1.3";
-import { renderMobileIndex } from "./js/mobile.js?ui=0.1.3";
+import {
+  renderDesktopIndex,
+  renderDesktopShell,
+  renderEditor,
+  updateDesktopContent,
+  updateDesktopToolbar,
+} from "./js/desktop.js?ui=0.1.3";
+import {
+  renderMobileIndex,
+  renderMobileShell,
+  updateMobileContent,
+} from "./js/mobile.js?ui=0.1.3";
 import { createUiServices } from "./js/overlays.js?ui=0.1.3";
 
 function renderFatal(message) {
@@ -71,8 +83,57 @@ function boot() {
 
   try {
     if (data.kind === "Index") {
-      renderDesktopIndex(desktopRoot, context);
-      renderMobileIndex(mobileRoot, context);
+      // 建 shell（一次性）
+      const mobileRefs = renderMobileShell(mobileRoot, context)
+      const desktopRefs = renderDesktopShell(desktopRoot, context)
+
+      // 初始渲染内容
+      updateMobileContent(mobileRefs.contentEl, context, mobileRefs)
+      updateDesktopContent(desktopRefs.contentEl, context)
+      updateDesktopToolbar(desktopRefs.toolbarEl, context)
+
+      // 创建路由器
+      const router = createRouter(async (pathname, query) => {
+        try {
+          const newData = await fetchDirectory(pathname)
+          context.data = newData
+          context.query = query
+          context.capabilities = capabilities(newData)
+          // 更新页面 title
+          document.title = pathname === '/' ? 'dufs' : pathname.split('/').filter(Boolean).pop() + ' — dufs'
+          // 区域更新
+          updateMobileContent(mobileRefs.contentEl, context, mobileRefs)
+          updateDesktopContent(desktopRefs.contentEl, context)
+          updateDesktopToolbar(desktopRefs.toolbarEl, context)
+        } catch (err) {
+          // fetch 失败降级为整页跳转
+          window.location.href = pathname + (query.q ? '?q=' + encodeURIComponent(query.q) : '')
+        }
+      })
+      router.init()
+
+      // 拦截目录链接点击（事件委托）
+      function handleDirClick(e) {
+        const a = e.target.closest('a')
+        if (!a) return
+        const href = a.getAttribute('href')
+        if (!href) return
+        const url = new URL(href, location.origin)
+        // 同源检查
+        if (url.origin !== location.origin) return
+        // 目录检查（pathname 以 / 结尾）
+        if (!url.pathname.endsWith('/')) return
+        // 无特殊参数：search 为空或只含 q
+        const params = url.searchParams
+        for (const key of params.keys()) {
+          if (key !== 'q') return
+        }
+        e.preventDefault()
+        router.push(url.pathname, {})
+      }
+
+      desktopRoot.addEventListener('click', handleDirClick)
+      mobileRoot.addEventListener('click', handleDirClick)
     } else {
       renderEditor(desktopRoot, context);
       mobileRoot.textContent = "";

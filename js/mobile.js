@@ -454,8 +454,18 @@ function createTrafficDots() {
   return dots;
 }
 
-export function renderMobileIndex(root, context) {
-  if (!root || !context) return;
+/**
+ * renderMobileShell — build the static shell once.
+ *
+ * Creates mobile-shell, mobile-header (topbar + breadcrumb + search), and an
+ * empty mobile-content container.  Also creates the hidden fileInput and
+ * exposes a `pickFiles` helper via `context.pickFiles`.
+ *
+ * Returns `{ contentEl, breadcrumbEl, searchInputEl }` so that
+ * updateMobileContent can update the mutable parts without re-querying the DOM.
+ */
+export function renderMobileShell(root, context) {
+  if (!root || !context) return null;
   const { data, query, capabilities, ui } = context;
   ensureSprite();
   root.textContent = '';
@@ -463,6 +473,7 @@ export function renderMobileIndex(root, context) {
   const shell = create('div', 'mobile-shell');
   const header = create('header', 'mobile-header');
 
+  // ── topbar ──────────────────────────────────────────────────────────────
   const topbar = create('div', 'mobile-topbar');
   const brand = create('a', 'mobile-brand');
   brand.href = rootHref(data);
@@ -477,6 +488,7 @@ export function renderMobileIndex(root, context) {
   });
   brand.append(mark);
 
+  // ── fileInput / pickFiles ───────────────────────────────────────────────
   const fileInput = create('input', 'visually-hidden');
   fileInput.type = 'file';
   fileInput.multiple = true;
@@ -493,7 +505,10 @@ export function renderMobileIndex(root, context) {
     fileInput.value = '';
   });
   const pickFiles = () => fileInput.click();
+  // Expose on context so callers (e.g. updateMobileContent) can trigger upload.
+  context.pickFiles = pickFiles;
 
+  // ── menu button ─────────────────────────────────────────────────────────
   const menuButton = create('button', 'mobile-iconbtn');
   let globalMenuOpen = false;
   menuButton.type = 'button';
@@ -505,7 +520,6 @@ export function renderMobileIndex(root, context) {
       if (ui && typeof ui.closeMenu === 'function') ui.closeMenu();
       return;
     }
-
     const closed = openGlobalMenu(menuButton, context, pickFiles);
     globalMenuOpen = true;
     if (closed && typeof closed.finally === 'function') {
@@ -518,18 +532,72 @@ export function renderMobileIndex(root, context) {
   const topActions = create('div', 'mobile-topbar__actions');
   topActions.append(menuButton);
 
-  topbar.append(brand, renderBreadcrumb(data), topActions);
+  // Initial breadcrumb (mutable — updateMobileContent will replace its children)
+  const breadcrumbEl = renderBreadcrumb(data);
+  topbar.append(brand, breadcrumbEl, topActions);
   header.append(topbar);
-  if (capabilities.search) header.append(renderSearch(query));
+
+  // Initial search (mutable input value updated by updateMobileContent)
+  let searchInputEl = null;
+  if (capabilities.search) {
+    const searchForm = renderSearch(query);
+    searchInputEl = searchForm.querySelector('.mobile-search__input');
+    header.append(searchForm);
+  }
 
   shell.append(header);
+
+  // ── empty content container ─────────────────────────────────────────────
+  const contentEl = create('div', 'mobile-content');
+  shell.append(contentEl);
+
+  shell.append(fileInput);
+  root.append(shell);
+
+  return { contentEl, breadcrumbEl, searchInputEl };
+}
+
+/**
+ * updateMobileContent — call on every navigation / data refresh.
+ *
+ * Clears contentEl and re-renders the file list (or empty state).
+ * Also syncs the breadcrumb and search-input value in the header.
+ *
+ * @param {HTMLElement} contentEl   The .mobile-content element from renderMobileShell.
+ * @param {object}      context     The current context (data, query, capabilities, ui …).
+ * @param {object}      [refs]      Optional refs returned by renderMobileShell
+ *                                  ({ breadcrumbEl, searchInputEl }).
+ */
+export function updateMobileContent(contentEl, context, refs) {
+  if (!contentEl || !context) return;
+  const { data, query, capabilities } = context;
+  const pickFiles = context.pickFiles;
+
+  // ── sync breadcrumb ─────────────────────────────────────────────────────
+  if (refs && refs.breadcrumbEl) {
+    const newBreadcrumb = renderBreadcrumb(data);
+    refs.breadcrumbEl.innerHTML = '';
+    while (newBreadcrumb.firstChild) {
+      refs.breadcrumbEl.appendChild(newBreadcrumb.firstChild);
+    }
+    // Keep aria-label in sync too.
+    refs.breadcrumbEl.setAttribute('aria-label', newBreadcrumb.getAttribute('aria-label') || 'Breadcrumb');
+  }
+
+  // ── sync search input value ─────────────────────────────────────────────
+  if (refs && refs.searchInputEl) {
+    refs.searchInputEl.value = (query && query.q) || '';
+  }
+
+  // ── clear and re-render content ─────────────────────────────────────────
+  contentEl.textContent = '';
 
   const paths = data.paths || [];
   if (paths.length === 0) {
     const host = create('div', 'mobile-empty-host');
     const kind = query.q ? 'search' : data.dir_exists === false ? 'pending' : 'empty';
-    if (ui && typeof ui.emptyState === 'function') {
-      ui.emptyState(host, {
+    if (context.ui && typeof context.ui.emptyState === 'function') {
+      context.ui.emptyState(host, {
         kind,
         query: query.q || '',
         capabilities,
@@ -539,16 +607,26 @@ export function renderMobileIndex(root, context) {
         onClearSearch: query.q ? () => navigate(baseUrl()) : undefined,
       });
     }
-    shell.append(host);
+    contentEl.append(host);
   } else {
     const list = create('div', 'mobile-list');
     list.setAttribute('role', 'list');
     const fragment = document.createDocumentFragment();
     paths.forEach((item) => fragment.append(renderRow(item, context)));
     list.append(fragment);
-    shell.append(list);
+    contentEl.append(list);
   }
+}
 
-  shell.append(fileInput);
-  root.append(shell);
+/**
+ * renderMobileIndex — backward-compatible entry point.
+ *
+ * Delegates to renderMobileShell + updateMobileContent so existing callers
+ * continue to work without modification.
+ */
+export function renderMobileIndex(root, context) {
+  if (!root || !context) return;
+  const refs = renderMobileShell(root, context);
+  if (!refs) return;
+  updateMobileContent(refs.contentEl, context, refs);
 }

@@ -562,3 +562,52 @@ export function createUploadQueue(options = {}) {
     getItems: snapshot,
   };
 }
+
+export async function fetchDirectory(url) {
+  const separator = url.includes("?") ? "&" : "?";
+  const response = await fetch(`${url}${separator}json`);
+  if (!response.ok) {
+    let body = "";
+    try {
+      body = await response.text();
+    } catch {
+      body = "";
+    }
+    throw httpError(response.status, body, response.statusText);
+  }
+  return response.json();
+}
+
+export function createRouter(onNavigate) {
+  function buildUrl(pathname, query) {
+    const params = new URLSearchParams();
+    if (query.q) params.set("q", query.q);
+    if (query.sort) params.set("sort", query.sort);
+    if (query.order) params.set("order", query.order);
+    const qs = params.toString();
+    return qs ? `${pathname}?${qs}` : pathname;
+  }
+
+  function onPopState() {
+    onNavigate(location.pathname, getQueryState());
+  }
+
+  function init() {
+    window.addEventListener("popstate", onPopState);
+  }
+
+  function push(pathname, query) {
+    history.pushState(null, "", buildUrl(pathname, query));
+    onNavigate(pathname, query);
+  }
+
+  function replace(pathname, query) {
+    history.replaceState(null, "", buildUrl(pathname, query));
+  }
+
+  function destroy() {
+    window.removeEventListener("popstate", onPopState);
+  }
+
+  return { init, push, replace, destroy };
+}
