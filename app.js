@@ -68,11 +68,9 @@ function boot() {
 
   let uiRef = null;
   const uploadQueue = createUploadQueue({
-    confirm: (options) => (uiRef ? uiRef.confirm(options) : Promise.resolve(false)),
+    confirm: (options) => uiRef.confirm(options),
     onUpdate: (items) => {
-      if (uiRef && typeof uiRef.onUploadUpdate === "function") {
-        uiRef.onUploadUpdate(items);
-      }
+      uiRef.onUploadUpdate(items);
     },
   });
 

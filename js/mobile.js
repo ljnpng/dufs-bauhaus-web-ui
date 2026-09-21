@@ -84,11 +84,7 @@ function messageFrom(error) {
 }
 
 function notifyError(context, error) {
-  if (context.ui && typeof context.ui.error === 'function') {
-    context.ui.error({ title: 'Action failed', message: messageFrom(error) });
-  } else if (context.ui && typeof context.ui.showFatal === 'function') {
-    context.ui.showFatal(error);
-  }
+  context.ui.error({ title: 'Action failed', message: messageFrom(error) });
 }
 
 async function downloadTo(url, filename) {
@@ -288,12 +284,10 @@ function renderRow(item, context) {
     event.preventDefault();
     event.stopPropagation();
     const items = rowMenuItems(item, context);
-    if (!items.length || !context.ui || typeof context.ui.menu !== 'function') return;
+    if (!items.length) return;
     row.classList.add('is-active');
     const closed = context.ui.menu(more, items);
-    if (closed && typeof closed.finally === 'function') {
-      closed.finally(() => row.classList.remove('is-active'));
-    }
+    closed.finally(() => row.classList.remove('is-active'));
   });
   row.append(more);
   return row;
@@ -404,7 +398,7 @@ function openGlobalMenu(anchor, context, pickFiles) {
   const caps = context.capabilities;
   const data = context.data;
   const items = [];
-  if (caps.upload && typeof pickFiles === 'function') {
+  if (caps.upload) {
     items.push({ id: 'upload', label: 'Upload', run: () => pickFiles() });
   }
   if (caps.create) {
@@ -460,7 +454,6 @@ function openGlobalMenu(anchor, context, pickFiles) {
  * updateMobileContent can update the mutable parts without re-querying the DOM.
  */
 export function renderMobileShell(root, context) {
-  if (!root || !context) return null;
   const { data, query, capabilities, ui } = context;
   ensureSprite();
   root.textContent = '';
@@ -491,11 +484,9 @@ export function renderMobileShell(root, context) {
   fileInput.setAttribute('aria-hidden', 'true');
   fileInput.addEventListener('change', () => {
     if (fileInput.files && fileInput.files.length && context.uploadQueue) {
-      if (ui && typeof ui.setUploadQueue === 'function') ui.setUploadQueue(context.uploadQueue);
+      ui.setUploadQueue(context.uploadQueue);
       context.uploadQueue.add(fileInput.files);
-      if (ui && typeof ui.showUploadQueue === 'function') {
-        ui.showUploadQueue(context.uploadQueue);
-      }
+      ui.showUploadQueue(context.uploadQueue);
     }
     fileInput.value = '';
   });
@@ -512,16 +503,14 @@ export function renderMobileShell(root, context) {
   menuButton.append(createIcon('more-bauhaus'));
   menuButton.addEventListener('click', () => {
     if (globalMenuOpen) {
-      if (ui && typeof ui.closeMenu === 'function') ui.closeMenu();
+      ui.closeMenu();
       return;
     }
     const closed = openGlobalMenu(menuButton, context, pickFiles);
     globalMenuOpen = true;
-    if (closed && typeof closed.finally === 'function') {
-      closed.finally(() => {
-        globalMenuOpen = false;
-      });
-    }
+    closed.finally(() => {
+      globalMenuOpen = false;
+    });
   });
 
   const topActions = create('div', 'mobile-topbar__actions');
@@ -564,12 +553,11 @@ export function renderMobileShell(root, context) {
  *                                  ({ breadcrumbEl, searchInputEl }).
  */
 export function updateMobileContent(contentEl, context, refs) {
-  if (!contentEl || !context) return;
   const { data, query, capabilities } = context;
   const pickFiles = context.pickFiles;
 
   // ── sync breadcrumb ─────────────────────────────────────────────────────
-  if (refs && refs.breadcrumbEl) {
+  if (refs.breadcrumbEl) {
     const newBreadcrumb = renderBreadcrumb(data);
     refs.breadcrumbEl.innerHTML = '';
     while (newBreadcrumb.firstChild) {
@@ -590,17 +578,15 @@ export function updateMobileContent(contentEl, context, refs) {
   if (paths.length === 0) {
     const host = create('div', 'mobile-empty-host');
     const kind = query.q ? 'search' : data.dir_exists === false ? 'pending' : 'empty';
-    if (context.ui && typeof context.ui.emptyState === 'function') {
-      context.ui.emptyState(host, {
-        kind,
-        query: query.q || '',
-        capabilities,
-        onUpload: capabilities.upload ? pickFiles : undefined,
-        onCreateFolder: capabilities.create ? () => runCreateFolder(context) : undefined,
-        onNewFile: capabilities.create ? () => runCreateFile(context) : undefined,
-        onClearSearch: query.q ? () => navigate(baseUrl()) : undefined,
-      });
-    }
+    context.ui.emptyState(host, {
+      kind,
+      query: query.q || '',
+      capabilities,
+      onUpload: capabilities.upload ? pickFiles : undefined,
+      onCreateFolder: capabilities.create ? () => runCreateFolder(context) : undefined,
+      onNewFile: capabilities.create ? () => runCreateFile(context) : undefined,
+      onClearSearch: query.q ? () => navigate(baseUrl()) : undefined,
+    });
     contentEl.append(host);
   } else {
     const list = create('div', 'mobile-list');
@@ -619,8 +605,6 @@ export function updateMobileContent(contentEl, context, refs) {
  * continue to work without modification.
  */
 export function renderMobileIndex(root, context) {
-  if (!root || !context) return;
   const refs = renderMobileShell(root, context);
-  if (!refs) return;
   updateMobileContent(refs.contentEl, context, refs);
 }

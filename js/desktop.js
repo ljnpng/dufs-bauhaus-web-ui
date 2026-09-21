@@ -10,7 +10,7 @@ import {
   joinAbsolutePath,
   joinEntryUrl,
 } from "./core.js?ui=0.1.14";
-import { bauhausLabel, createIcon, renderEmptyState } from "./overlays.js?ui=0.1.14";
+import { bauhausLabel, createIcon } from "./overlays.js?ui=0.1.14";
 
 const PREVIEW_EXTENSIONS = new Set([
   "pdf",
@@ -131,9 +131,7 @@ function pickFiles(context) {
   input.addEventListener("change", () => {
     if (input.files && input.files.length) {
       context.uploadQueue.add(input.files);
-      if (context.ui && typeof context.ui.showUploadQueue === "function") {
-        context.ui.showUploadQueue();
-      }
+      context.ui.showUploadQueue();
     }
     input.remove();
   });
@@ -421,9 +419,7 @@ function openRowMenu(anchor, row, item, context) {
     },
   }));
   const close = context.ui.menu(anchor, wrapped);
-  if (close && typeof close.then === "function") {
-    close.finally(() => row.removeAttribute("aria-selected"));
-  }
+  close.finally(() => row.removeAttribute("aria-selected"));
 }
 
 function rowMenuItems(item, context) {
@@ -627,11 +623,7 @@ function renderEmpty(container, kind, query, context) {
     title: copy.title,
     message: copy.message,
   };
-  if (context.ui && typeof context.ui.emptyState === "function") {
-    context.ui.emptyState(container, spec);
-    return;
-  }
-  renderEmptyState(container, spec);
+  context.ui.emptyState(container, spec);
 }
 
 /**
