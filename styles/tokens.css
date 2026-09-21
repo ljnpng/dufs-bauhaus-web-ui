@@ -10,6 +10,7 @@
   --color-primary-soft: #eff6ff;
   --color-bauhaus-red: #ef3340;
   --color-bauhaus-yellow: #f5b82e;
+  --color-action-active: var(--color-bauhaus-yellow);
   --color-success: #16a34a;
   --color-danger: #dc2626;
   --color-danger-soft: #fef2f2;
@@ -86,6 +87,7 @@
   --motion-fast: 120ms;
   --motion-panel: 180ms;
   --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --motion-press-offset: 2px;
 
   /* Z-index */
   --z-base: 0;

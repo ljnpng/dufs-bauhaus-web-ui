@@ -89,8 +89,8 @@
 }
 
 .mobile-iconbtn:active {
-  background: var(--color-border);
-  transform: scale(0.97);
+  background: var(--color-action-active);
+  transform: translateY(var(--motion-press-offset));
 }
 
 .mobile-iconbtn .icon {
@@ -162,8 +162,9 @@
 }
 
 .mobile-breadcrumb a.crumb:active {
-  background: var(--color-border);
-  transform: scale(0.97);
+  background: var(--color-action-active);
+  color: var(--color-text);
+  transform: translateY(var(--motion-press-offset));
 }
 
 .mobile-breadcrumb .crumb--current {
@@ -309,8 +310,8 @@
 }
 
 .mobile-row__main:active {
-  background: var(--color-primary-soft);
-  transform: scale(0.98);
+  background: var(--color-action-active);
+  transform: translateX(var(--motion-press-offset));
 }
 
 .mobile-row__icon {
@@ -399,8 +400,8 @@
 
 .mobile-row__more:active {
   color: var(--color-text);
-  background: var(--color-border);
-  transform: scale(0.97);
+  background: var(--color-action-active);
+  transform: translateY(var(--motion-press-offset));
 }
 
 .mobile-row__more .icon {

@@ -34,6 +34,7 @@ figure {
 a {
   color: var(--color-primary);
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a:hover {
@@ -48,6 +49,7 @@ button {
   color: inherit;
   font: inherit;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input,
@@ -152,12 +154,20 @@ svg {
   transition:
     background var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease);
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .btn:hover:not(:disabled) {
   background: var(--color-hover);
   border-color: var(--color-disabled);
+}
+
+.btn:active:not(:disabled) {
+  background: var(--color-action-active);
+  border-color: var(--color-text);
+  color: var(--color-text);
+  transform: translateY(var(--motion-press-offset));
 }
 
 .btn--primary {
@@ -171,6 +181,12 @@ svg {
   background: var(--color-primary-hover);
 }
 
+.btn--primary:active:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+  color: var(--color-surface);
+}
+
 .btn--danger {
   color: var(--color-danger);
 }
@@ -178,6 +194,12 @@ svg {
 .btn--danger:hover:not(:disabled) {
   border-color: var(--color-danger);
   background: var(--color-danger-soft);
+}
+
+.btn--danger:active:not(:disabled) {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-surface);
 }
 
 .btn:disabled {
@@ -200,13 +222,21 @@ svg {
   transition:
     background var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease);
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .icon-btn:hover:not(:disabled) {
   background: var(--color-hover);
   border-color: var(--color-disabled);
   color: var(--color-text);
+}
+
+.icon-btn:active:not(:disabled) {
+  background: var(--color-action-active);
+  border-color: var(--color-text);
+  color: var(--color-text);
+  transform: translateY(var(--motion-press-offset));
 }
 
 .icon-btn:disabled {

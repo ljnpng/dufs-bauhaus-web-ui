@@ -28,7 +28,8 @@ body.ui-no-scroll {
   transition:
     background-color var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease);
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .ui-btn:hover:not(:disabled) {
@@ -98,7 +99,8 @@ body.ui-no-scroll {
   cursor: pointer;
   transition:
     background-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease);
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .ui-menu-item .icon {
@@ -535,11 +537,13 @@ body.ui-no-scroll {
   }
 
   .ui-btn:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: translateY(var(--motion-press-offset));
   }
 
   .ui-btn:not(.ui-btn--primary):not(.ui-btn--danger):active:not(:disabled) {
-    background: var(--color-border);
+    background: var(--color-action-active);
+    border-color: var(--color-text);
+    color: var(--color-text);
   }
 
   .ui-btn--primary:active:not(:disabled) {
@@ -553,8 +557,9 @@ body.ui-no-scroll {
   }
 
   .ui-menu-item:active:not(:disabled) {
-    background: var(--color-border);
-    transform: scale(0.98);
+    background: var(--color-action-active);
+    color: var(--color-text);
+    transform: translateX(var(--motion-press-offset));
   }
 
   .ui-menu-item--danger {
