@@ -623,3 +623,4 @@ export function renderMobileIndex(root, context) {
   if (!refs) return;
   updateMobileContent(refs.contentEl, context, refs);
 }
+    cursorAtEnd: true,

@@ -891,3 +891,7 @@ export function createUiServices(root, context) {
     closeMenu,
   };
 }
+      cursorAtEnd = false,
+      if (cursorAtEnd) {
+        requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+      }

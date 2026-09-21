@@ -785,3 +785,4 @@ async function loadText(textarea, saveButton, url, context) {
     }
   }
 }
+    cursorAtEnd: true,
