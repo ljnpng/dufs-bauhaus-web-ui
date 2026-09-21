@@ -81,47 +81,40 @@ function boot() {
 
   try {
     if (data.kind === "Index") {
-      // 建 shell（一次性）
       const mobileRefs = renderMobileShell(mobileRoot, context)
       const desktopRefs = renderDesktopShell(desktopRoot, context)
 
-      // 初始渲染内容
       updateMobileContent(mobileRefs.contentEl, context, mobileRefs)
       updateDesktopContent(desktopRefs.contentEl, context)
       updateDesktopToolbar(desktopRefs.toolbarEl, context)
 
-      // 创建路由器
       const router = createRouter(async (pathname, query) => {
         try {
           const newData = await fetchDirectory(pathname)
           context.data = newData
           context.query = query
           context.capabilities = capabilities(newData)
-          // 更新页面 title
           document.title = pathname === '/' ? 'dufs' : pathname.split('/').filter(Boolean).pop() + ' — dufs'
-          // 区域更新
           updateMobileContent(mobileRefs.contentEl, context, mobileRefs)
           updateDesktopContent(desktopRefs.contentEl, context)
           updateDesktopToolbar(desktopRefs.toolbarEl, context)
         } catch (err) {
-          // fetch 失败降级为整页跳转
+          // Fall back to full-page navigation on fetch failure
           window.location.href = pathname + (query.q ? '?q=' + encodeURIComponent(query.q) : '')
         }
       })
       router.init()
 
-      // 拦截目录链接点击（事件委托）
+      // Intercept directory link clicks (event delegation)
       function handleDirClick(e) {
         const a = e.target.closest('a')
         if (!a) return
         const href = a.getAttribute('href')
         if (!href) return
         const url = new URL(href, location.origin)
-        // 同源检查
         if (url.origin !== location.origin) return
-        // 目录检查（pathname 以 / 结尾）
         if (!url.pathname.endsWith('/')) return
-        // 无特殊参数：search 为空或只含 q
+        // Only intercept clean directory navigation; bail if any param other than q is present
         const params = url.searchParams
         for (const key of params.keys()) {
           if (key !== 'q') return

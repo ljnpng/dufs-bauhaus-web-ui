@@ -303,7 +303,6 @@ function renderBreadcrumb(data) {
   // At root level the breadcrumb is empty.
   if (segments.length === 0) return nav;
 
-  // Build full path list: [{label, href}, ...]
   const crumbs = [];
   let path = prefix;
   segments.forEach((segment, index) => {
