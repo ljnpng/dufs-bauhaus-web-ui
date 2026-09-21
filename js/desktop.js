@@ -422,11 +422,6 @@ function rowMenuItems(item, context) {
       label: "Download",
       run: () => downloadTo(url),
     });
-    items.push({
-      id: "view",
-      label: "View",
-      run: () => navigate(`${url}?view`),
-    });
     if (caps.edit) {
       items.push({
         id: "edit",
