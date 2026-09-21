@@ -55,13 +55,16 @@ icons/LICENSE.md           第三方 icon 来源与许可证
 --color-text: #14213d;
 --color-text-muted: #687280;
 --color-border: #e5e7eb;
---color-primary: #2563eb;
---color-primary-hover: #1d4ed8;
---color-primary-soft: #eff6ff;
+--color-bauhaus-blue: #0758c9;
 --color-bauhaus-red: #ef3340;
 --color-bauhaus-yellow: #f5b82e;
+--color-bauhaus-yellow-ink: #a97400;   /* 浅底小字用的可读黄 */
+--color-primary: var(--color-bauhaus-blue);
+--color-primary-hover: #06449e;
+--color-primary-soft: #e8f0fa;
 --color-success: #16a34a;
---color-danger: #dc2626;
+--color-danger: var(--color-bauhaus-red);
+--color-danger-hover: #c81e2b;
 --color-danger-soft: #fef2f2;
 --color-hover: #f3f4f6;
 --color-disabled: #9ca3af;
@@ -70,10 +73,19 @@ icons/LICENSE.md           第三方 icon 来源与许可证
 
 红、黄、蓝只作操作、状态、几何 accent，不作大面积背景。
 
+语义映射（2026-09-21 统一）：
+
+- 蓝 `#0758c9`：主操作、选中、焦点、链接、进度。
+- 黄 `#f5b82e`：进行中/激活/按压反馈。
+- 红 `#ef3340`：危险、删除、错误。
+
+蓝必须用 `--color-bauhaus-blue`，不得再出现 Tailwind 蓝 `#2563eb`；`--color-primary` / `--color-danger` 均引用 Bauhaus 原色。静态 icon 资产内嵌同一批 hex（见 `icons/*`）。
+
 ### 2. Typography
 
 ```css
 --font-ui: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+--font-display: var(--font-ui);
 --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 --font-size-caption: 0.75rem;   /* 12px */
 --font-size-ui: 0.875rem;       /* 14px */
@@ -86,9 +98,12 @@ icons/LICENSE.md           第三方 icon 来源与许可证
 --font-weight-bold: 700;
 --line-height-tight: 1.25;
 --line-height-ui: 1.5;
+--tracking-caps: 0.04em;
 ```
 
-不拉取 Web Font；系统 fallback 必须可用。
+字体走现代中性路线（Inter + 系统 fallback），不拉取 Web Font。
+
+大写 + `--tracking-caps` **只**用于表头（`.file-table th`）这一个 micro-label。按钮、对话框/empty/fatal 标题、badge 一律 sentence case。2026-09-21 调整为「现代为底 + Bauhaus 小细节」。
 
 ### 3. Spacing
 
@@ -124,22 +139,26 @@ Breakpoints：mobile `0–639px`；tablet `640–1023px`；desktop `>=1024px`。
 ### 5. Radius
 
 ```css
---radius-sm: 0.25rem;
---radius-control: 0.375rem;
---radius-panel: 0.5rem;
+--radius-sm: 0.25rem;    /* 4px */
+--radius-control: 0.375rem; /* 6px */
+--radius-panel: 0.5rem;  /* 8px */
 --radius-round: 999px;
 ```
 
-`--radius-round` 仅用于 FAB、状态点、头像类元素。
+现代圆角尺度；`--radius-round` 用于状态点、traffic dots、badge、进度条。
 
 ### 6. Border
 
 ```css
 --border-width: 1px;
 --border-default: var(--border-width) solid var(--color-border);
+--border-control: var(--border-width) solid var(--color-border);
+--border-strong: var(--border-width) solid var(--color-border);
 --border-focus: 2px solid var(--color-primary);
 --border-selected: 3px solid var(--color-primary);
 ```
+
+所有边框统一为中性 1px 灰边（`--border-default/control/strong` 同值），不再用粗黑框。颜色靠 Bauhaus accent 承担：选中行 `box-shadow: inset 3px 0 0 var(--color-primary)`。
 
 ### 7. Shadow
 
@@ -149,7 +168,15 @@ Breakpoints：mobile `0–639px`；tablet `640–1023px`；desktop `>=1024px`。
 --shadow-dialog: 0 16px 40px rgba(20, 33, 61, 0.18);
 ```
 
-Hover 用背景和边框；不用加重阴影。
+回到现代柔和阴影表达层级。
+
+### Bauhaus 小细节（唯一的结构性 Bauhaus 元素）
+
+顶部红黄蓝 composition strip：`.desktop-toolbar` / `.mobile-header` / `.editor-toolbar` 的 `::before` 为 3px 三色线性渐变（`base.css`）。其余 Bauhaus 表达都在内容层：几何 logo/wordmark、traffic dots、彩色文件图标、几何 empty-state 插画、胶黄按压态、三原色语义。
+
+- **文本按钮统一白底 + 首字母带色**：所有含文字的按钮一律白底（`--color-surface`）、中性 1px 灰边、正文 `--color-text`，不再有蓝色/红色填充；层级只靠首字母颜色。首字母由 `bauhausLabel()`（`js/overlays.js`）包成 `.bauhaus-initial`：默认蓝，`danger` 用红（`Delete` 等整行文字不全红）。覆盖 toolbar、editor、empty-state、dialog、upload/fatal 的全部文字按钮。菜单项同样无前置 icon、首字母按序循环 `red → yellow → blue`。纯 icon 按钮（排序、刷新、行内更多）不变，本就不带文字。
+- **Bauhaus 几何 more（仅移动端 toolbar）**：移动顶栏右上角菜单按钮由红/黄/蓝 traffic dots 改为 `more-bauhaus` symbol —— 原始横排三点，其中两点换成红三角 + 黄方块，末点仍是蓝圆（横向一排；inline style 填充以覆盖 `.icon` 的 `stroke/fill`）。桌面 toolbar 的 "More actions" 与行内操作仍用标准竖点 `more`。原 `.mobile-traffic-dots` 代码与样式已删除。
+- **搜索框**：放大镜用 `--color-primary` 蓝，清除 x 用 `--color-danger` 红（hover `--color-danger-hover`）；桌面与移动一致，桌面版桌面搜索框补上 leading 放大镜（`.toolbar-search__field`）。
 
 ### 8. Icon
 
@@ -163,7 +190,7 @@ Hover 用背景和边框；不用加重阴影。
 --icon-stroke: 1.875;
 ```
 
-Action icon 使用统一 `24x24` viewBox/sprite；Folder/File 是独立资产。隐藏项由点状轮廓表达；symlink 使用 badge，不另建整套图标。
+Action icon 使用统一 `24x24` viewBox/sprite；Folder/File 是独立资产。`.icon` 用 `stroke-linecap/linejoin: round`，标准 1.875 描边。隐藏项由点状轮廓表达；symlink 使用 badge，不另建整套图标。
 
 ### Motion
 

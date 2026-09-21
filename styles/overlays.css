@@ -21,7 +21,7 @@ body.ui-no-scroll {
   line-height: var(--line-height-tight);
   color: var(--color-text);
   background: var(--color-surface);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-control);
   white-space: nowrap;
   cursor: pointer;
@@ -42,27 +42,8 @@ body.ui-no-scroll {
   cursor: not-allowed;
 }
 
-.ui-btn--primary {
-  color: var(--color-surface);
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.ui-btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-}
-
-.ui-btn--danger {
-  color: var(--color-surface);
-  background: var(--color-danger);
-  border-color: var(--color-danger);
-}
-
-.ui-btn--danger:hover:not(:disabled) {
-  background: var(--color-danger);
-  border-color: var(--color-danger);
-}
+/* Variants share one white surface; hierarchy comes from the Bauhaus first
+   letter and (for danger) its red accent. */
 
 /* ------------------------------------------------------------------- menu */
 
@@ -74,7 +55,7 @@ body.ui-no-scroll {
   padding: var(--space-1);
   list-style: none;
   background: var(--color-surface);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-menu);
   animation: ui-menu-in var(--motion-fast) var(--motion-ease);
@@ -83,19 +64,18 @@ body.ui-no-scroll {
 .ui-menu-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
   width: 100%;
   min-height: var(--density-hit-target);
   padding: 0 var(--space-3);
   font-family: var(--font-ui);
   font-size: var(--font-size-ui);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
   text-align: left;
   color: var(--color-text);
   background: transparent;
   border: 0;
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     background-color var(--motion-fast) var(--motion-ease),
@@ -103,24 +83,8 @@ body.ui-no-scroll {
     transform var(--motion-fast) var(--motion-ease);
 }
 
-.ui-menu-item .icon {
-  color: var(--color-text-muted);
-}
-
 .ui-menu-item:hover:not(:disabled) {
   background: var(--color-hover);
-}
-
-.ui-menu-item:hover:not(:disabled) .icon {
-  color: var(--color-text);
-}
-
-.ui-menu-item--danger {
-  color: var(--color-danger);
-}
-
-.ui-menu-item--danger .icon {
-  color: var(--color-danger);
 }
 
 .ui-menu-item--danger:hover:not(:disabled) {
@@ -132,7 +96,7 @@ body.ui-no-scroll {
   cursor: not-allowed;
 }
 
-.ui-menu-item:disabled .icon {
+.ui-menu-item:disabled .bauhaus-initial {
   color: var(--color-disabled);
 }
 
@@ -189,7 +153,7 @@ body.ui-no-scroll {
   max-width: var(--size-dialog-max);
   max-height: calc(100vh - var(--space-8));
   background: var(--color-surface);
-  border: var(--border-default);
+  border: var(--border-strong);
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-dialog);
   animation: ui-dialog-in var(--motion-panel) var(--motion-ease);
@@ -200,7 +164,7 @@ body.ui-no-scroll {
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-6);
-  border-bottom: var(--border-default);
+  border-bottom: var(--border-strong);
 }
 
 .ui-dialog__title {
@@ -257,14 +221,14 @@ body.ui-no-scroll {
   font-size: var(--font-size-ui);
   color: var(--color-text);
   background: var(--color-surface);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-control);
 }
 
 .ui-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-soft);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 .ui-field__error {
@@ -537,18 +501,10 @@ body.ui-no-scroll {
   }
 
   .ui-btn:active:not(:disabled) {
-    transform: translateY(var(--motion-press-offset));
-  }
-
-  .ui-btn:not(.ui-btn--primary):not(.ui-btn--danger):active:not(:disabled) {
     background: var(--color-action-active);
     border-color: var(--color-text);
     color: var(--color-text);
-  }
-
-  .ui-btn--primary:active:not(:disabled) {
-    background: var(--color-primary-hover);
-    border-color: var(--color-primary-hover);
+    transform: translateY(var(--motion-press-offset));
   }
 
   .ui-menu-item {
@@ -560,14 +516,6 @@ body.ui-no-scroll {
     background: var(--color-action-active);
     color: var(--color-text);
     transform: translateX(var(--motion-press-offset));
-  }
-
-  .ui-menu-item--danger {
-    color: var(--color-danger);
-  }
-
-  .ui-menu-item--danger .icon {
-    color: var(--color-danger);
   }
 
   .ui-menu-item--danger:active:not(:disabled) {

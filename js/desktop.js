@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from "./core.js?ui=0.1.3";
-import { createIcon, renderEmptyState } from "./overlays.js?ui=0.1.3";
+} from "./core.js?ui=0.1.13";
+import { bauhausLabel, createIcon, renderEmptyState } from "./overlays.js?ui=0.1.13";
 
 const PREVIEW_EXTENSIONS = new Set([
   "pdf",
@@ -179,9 +179,26 @@ function renderBreadcrumb(data) {
   return nav;
 }
 
+function renderBrand(data) {
+  const link = create("a", "desktop-brand");
+  link.href = uriRoot(data);
+  link.setAttribute("aria-label", "dufs home");
+  const img = document.createElement("img");
+  img.className = "desktop-brand__mark";
+  img.src = assetUrl("brand.svg");
+  img.alt = "";
+  img.decoding = "async";
+  img.addEventListener("error", () => {
+    img.style.visibility = "hidden";
+  });
+  link.append(img);
+  return link;
+}
+
 function renderSearch(data, query) {
   const form = create("form", "toolbar-search");
   form.setAttribute("role", "search");
+  const field = create("div", "toolbar-search__field");
   const input = create("input", "field-input");
   input.type = "search";
   input.name = "q";
@@ -193,7 +210,8 @@ function renderSearch(data, query) {
     navigate(buildQueryUrl({}));
   }, "icon-btn icon-btn--plain toolbar-search__clear");
   clear.hidden = !query.q;
-  form.append(input, clear);
+  field.append(createIcon("search"), input, clear);
+  form.append(field);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const value = input.value.trim();
@@ -227,7 +245,7 @@ function renderSortHeader(label, field, query) {
 function renderToolbar(data, query, context) {
   const caps = context.capabilities;
   const toolbar = create("div", "desktop-toolbar");
-  toolbar.append(renderBreadcrumb(data));
+  toolbar.append(renderBrand(data), renderBreadcrumb(data));
 
   if (caps.search) {
     toolbar.append(renderSearch(data, query));
@@ -238,7 +256,7 @@ function renderToolbar(data, query, context) {
   if (caps.upload) {
     const uploadBtn = create("button", "btn btn--primary");
     uploadBtn.type = "button";
-    uploadBtn.append(createIcon("upload"), create("span", null, "Upload"));
+    uploadBtn.append(bauhausLabel("Upload"));
     uploadBtn.addEventListener("click", () => pickFiles(context));
     actions.append(uploadBtn);
   }
@@ -254,7 +272,7 @@ function renderToolbar(data, query, context) {
   if (caps.login) {
     const login = create("button", "btn");
     login.type = "button";
-    login.textContent = "Sign in";
+    login.append(bauhausLabel("Sign in"));
     login.addEventListener("click", async () => {
       try {
         await api.checkAuth(true);
@@ -271,13 +289,11 @@ function renderToolbar(data, query, context) {
     menuItems.push({
       id: "new-folder",
       label: "New folder",
-      icon: "add",
       run: () => runCreateFolder(context),
     });
     menuItems.push({
       id: "new-file",
       label: "New file",
-      icon: "add",
       run: () => runCreateFile(context),
     });
   }
@@ -285,7 +301,6 @@ function renderToolbar(data, query, context) {
     menuItems.push({
       id: "logout",
       label: `Sign out${data.user ? ` (${data.user})` : ""}`,
-      icon: "logout",
       run: () => runLogout(data),
     });
   }
@@ -398,7 +413,6 @@ function rowMenuItems(item, context) {
       items.push({
         id: "download",
         label: "Download as zip",
-        icon: "download",
         run: () => downloadTo(`${url}?zip`),
       });
     }
@@ -406,20 +420,17 @@ function rowMenuItems(item, context) {
     items.push({
       id: "download",
       label: "Download",
-      icon: "download",
       run: () => downloadTo(url),
     });
     items.push({
       id: "view",
       label: "View",
-      icon: "list",
       run: () => navigate(`${url}?view`),
     });
     if (caps.edit) {
       items.push({
         id: "edit",
         label: "Edit",
-        icon: "edit",
         run: () => navigate(`${url}?edit`),
       });
     }
@@ -429,7 +440,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: "move",
       label: "Rename / Move",
-      icon: "move",
       run: () => runMove(item, url, context),
     });
   }
@@ -437,7 +447,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: "copy",
       label: "Copy",
-      icon: "copy",
       run: () => runCopy(item, url, context),
     });
   }
@@ -445,7 +454,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: "delete",
       label: "Delete",
-      icon: "delete",
       danger: true,
       run: () => runDelete(item, url, context),
     });
@@ -701,7 +709,7 @@ export function renderEditor(root, context) {
   if (canSave) {
     saveButton = create("button", "btn btn--primary");
     saveButton.type = "button";
-    saveButton.textContent = "Save";
+    saveButton.append(bauhausLabel("Save"));
     saveButton.disabled = true;
     actions.append(saveButton);
   }
@@ -760,7 +768,7 @@ export function renderEditor(root, context) {
   );
   const download = create("button", "btn btn--primary");
   download.type = "button";
-  download.append(createIcon("download"), create("span", null, "Download"));
+  download.append(bauhausLabel("Download"));
   download.addEventListener("click", () => downloadTo(fileUrl));
   message.append(download);
   body.append(message);

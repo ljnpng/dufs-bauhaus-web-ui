@@ -26,8 +26,22 @@
     align-items: center;
     gap: var(--space-4);
     padding: 0 var(--page-gutter-desktop);
-    border-bottom: var(--border-default);
+    border-bottom: var(--border-strong);
     background: var(--color-surface);
+  }
+
+  .desktop-brand {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .desktop-brand__mark {
+    display: block;
+    width: auto;
+    height: var(--size-brand);
   }
 
   .breadcrumb {
@@ -78,12 +92,51 @@
     min-width: 0;
   }
 
-  .toolbar-search .field-input {
+  .toolbar-search__field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    min-width: 0;
     min-height: var(--size-control);
+    padding: 0 var(--space-1) 0 var(--space-3);
+    background: var(--color-surface);
+    border: var(--border-control);
+    border-radius: var(--radius-control);
+    transition: border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .toolbar-search__field:focus-within {
+    border-color: var(--color-primary);
+    outline: var(--border-focus);
+    outline-offset: 1px;
+  }
+
+  .toolbar-search__field > .icon {
+    flex: none;
+    color: var(--color-primary);
+  }
+
+  .toolbar-search__field .field-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .toolbar-search__field .field-input:focus-visible {
+    outline: none;
   }
 
   .toolbar-search__clear {
-    margin-left: calc(-1 * var(--size-control) - var(--space-1));
+    flex: none;
+    color: var(--color-danger);
+  }
+
+  .toolbar-search__clear:hover:not(:disabled) {
+    color: var(--color-danger-hover);
   }
 
   .toolbar-actions {
@@ -122,7 +175,7 @@
     color: var(--color-text-muted);
     font-size: var(--font-size-caption);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--tracking-caps);
     text-align: left;
     text-transform: uppercase;
   }
@@ -152,7 +205,7 @@
 
   .file-row[aria-selected="true"] {
     background: var(--color-primary-soft);
-    box-shadow: inset var(--border-selected);
+    box-shadow: inset 3px 0 0 var(--color-primary);
   }
 
   .col-name {

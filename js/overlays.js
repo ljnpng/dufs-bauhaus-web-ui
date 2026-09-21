@@ -1,4 +1,4 @@
-import { assetUrl } from './core.js?ui=0.1.3';
+import { assetUrl } from './core.js?ui=0.1.13';
 
 const NS = 'http://www.w3.org/2000/svg';
 const FOCUSABLE =
@@ -53,6 +53,20 @@ export function createIcon(name, options = {}) {
   use.setAttribute('href', `#${name}`);
   svg.appendChild(use);
   return svg;
+}
+
+/* Bauhaus detail: labels keep their wordmark ink, but the first letter carries
+   an accent drawn from the red/yellow/blue trio. */
+export const BAUHAUS_INITIAL_COLORS = ['red', 'yellow', 'blue'];
+
+export function bauhausLabel(text, color = 'blue', className = '') {
+  const label = el('span', { class: ['bauhaus-label', className].filter(Boolean).join(' ') });
+  const value = String(text == null ? '' : text);
+  if (!value) return label;
+  const tone = BAUHAUS_INITIAL_COLORS.includes(color) || color === 'danger' ? color : 'blue';
+  label.appendChild(el('span', { class: `bauhaus-initial bauhaus-initial--${tone}`, text: value.slice(0, 1) }));
+  if (value.length > 1) label.appendChild(document.createTextNode(value.slice(1)));
+  return label;
 }
 
 export function ensureSprite() {
@@ -184,13 +198,12 @@ function toNumber(value, fallback) {
   return Number.isFinite(number) ? number : fallback;
 }
 
-function actionButton(label, icon, onClick, variant) {
+function actionButton(label, onClick, variant) {
   const button = el('button', {
     type: 'button',
     class: `ui-btn${variant === 'primary' ? ' ui-btn--primary' : ''}`,
   });
-  if (icon) button.appendChild(createIcon(icon));
-  button.appendChild(el('span', { text: label }));
+  button.appendChild(bauhausLabel(label));
   if (typeof onClick === 'function') button.addEventListener('click', onClick);
   return button;
 }
@@ -269,11 +282,10 @@ function buildEmptyState(spec = {}) {
     // field is the single clear control; no need to duplicate it here.
   }
   if ((kind === 'empty' || kind === 'pending') && canUpload) {
-    if (onUpload) actions.appendChild(actionButton('Upload', 'upload', onUpload, 'primary'));
-    if (onCreateFolder) {
-      actions.appendChild(actionButton('New folder', 'folder-plus', onCreateFolder));
-    }
-    if (onNewFile) actions.appendChild(actionButton('New file', 'file-plus', onNewFile));
+    if (onUpload) actions.appendChild(actionButton('Upload', onUpload, 'primary'));
+    if (onCreateFolder)
+      actions.appendChild(actionButton('New folder', onCreateFolder));
+    if (onNewFile) actions.appendChild(actionButton('New file', onNewFile));
   }
   if (actions.childNodes.length) wrap.appendChild(actions);
 
@@ -441,6 +453,8 @@ export function createUiServices(root, context) {
     enabled[index].focus();
   }
 
+  /* Bauhaus detail: menus are text-only, with the leading letter carrying a
+     cycling red/yellow/blue accent (danger items stay red). */
   function menu(anchor, items) {
     closeMenu({ restoreFocus: false });
     const list = (items || []).filter(Boolean).filter((item) => item.separator || item.label);
@@ -449,6 +463,7 @@ export function createUiServices(root, context) {
     return new Promise((resolve) => {
       const node = el('div', { class: 'ui-menu', role: 'menu', tabindex: '-1' });
       const buttons = [];
+      let labelIndex = 0;
 
       for (const item of list) {
         if (item.separator) {
@@ -464,8 +479,11 @@ export function createUiServices(root, context) {
           button.disabled = true;
           button.setAttribute('aria-disabled', 'true');
         }
-        if (item.icon) button.appendChild(createIcon(item.icon));
-        button.appendChild(el('span', { class: 'ui-menu-label', text: item.label }));
+        const tone = item.danger
+          ? 'danger'
+          : BAUHAUS_INITIAL_COLORS[labelIndex % BAUHAUS_INITIAL_COLORS.length];
+        button.appendChild(bauhausLabel(item.label, tone, 'ui-menu-label'));
+        labelIndex += 1;
         button.addEventListener('click', (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -558,13 +576,13 @@ export function createUiServices(root, context) {
       const cancel = el(
         'button',
         { type: 'button', class: 'ui-btn' },
-        cancelLabel || cancelText || 'Cancel',
+        bauhausLabel(cancelLabel || cancelText || 'Cancel', 'yellow'),
       );
       cancel.addEventListener('click', () => finish(false));
       const ok = el(
         'button',
         { type: 'button', class: `ui-btn ${danger ? 'ui-btn--danger' : 'ui-btn--primary'}` },
-        confirmLabel || confirmText || 'Confirm',
+        bauhausLabel(confirmLabel || confirmText || 'Confirm', danger ? 'danger' : 'blue'),
       );
       ok.addEventListener('click', () => finish(true));
       footer.append(cancel, ok);
@@ -637,13 +655,13 @@ export function createUiServices(root, context) {
       const cancel = el(
         'button',
         { type: 'button', class: 'ui-btn' },
-        cancelLabel || cancelText || 'Cancel',
+        bauhausLabel(cancelLabel || cancelText || 'Cancel', 'yellow'),
       );
       cancel.addEventListener('click', () => finish(null));
       const ok = el(
         'button',
         { type: 'submit', class: 'ui-btn ui-btn--primary' },
-        confirmLabel || confirmText || 'OK',
+        bauhausLabel(confirmLabel || confirmText || 'OK'),
       );
       footer.append(cancel, ok);
 
@@ -667,7 +685,11 @@ export function createUiServices(root, context) {
       if (detail) body.appendChild(el('p', { class: 'ui-dialog__detail', text: cleanMessage(detail) }));
 
       const footer = el('div', { class: 'ui-dialog__footer' });
-      const ok = el('button', { type: 'button', class: 'ui-btn ui-btn--primary' }, 'OK');
+      const ok = el(
+        'button',
+        { type: 'button', class: 'ui-btn ui-btn--primary' },
+        bauhausLabel('OK'),
+      );
       footer.appendChild(ok);
 
       const close = openDialog({
@@ -752,7 +774,11 @@ export function createUiServices(root, context) {
     li.appendChild(meta);
 
     if (status === 'failed') {
-      const retry = el('button', { type: 'button', class: 'ui-btn upload-item__retry' }, 'Retry');
+      const retry = el(
+        'button',
+        { type: 'button', class: 'ui-btn upload-item__retry' },
+        bauhausLabel('Retry'),
+      );
       retry.addEventListener('click', () => {
         const retryFn = queue && (queue.retry || queue.retryUpload || queue.resume);
         if (typeof retryFn !== 'function') {
@@ -778,7 +804,11 @@ export function createUiServices(root, context) {
     const body = el('div', {}, empty, list);
 
     const footer = el('div', { class: 'ui-dialog__footer' });
-    const done = el('button', { type: 'button', class: 'ui-btn ui-btn--primary' }, 'Done');
+    const done = el(
+      'button',
+      { type: 'button', class: 'ui-btn ui-btn--primary' },
+      bauhausLabel('Done'),
+    );
     footer.appendChild(done);
 
     let unsubscribe = null;
@@ -815,7 +845,11 @@ export function createUiServices(root, context) {
     layer.appendChild(createIcon('alert', { className: 'fatal-state__icon' }));
     layer.appendChild(el('h2', { class: 'empty-state__title', text: 'This page could not load' }));
     layer.appendChild(el('p', { class: 'empty-state__message', text: message }));
-    const reload = el('button', { type: 'button', class: 'ui-btn ui-btn--primary' }, 'Reload');
+    const reload = el(
+      'button',
+      { type: 'button', class: 'ui-btn ui-btn--primary' },
+      bauhausLabel('Reload'),
+    );
     reload.addEventListener('click', () => location.reload());
     layer.appendChild(reload);
     overlayRoot.appendChild(layer);

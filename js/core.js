@@ -1,4 +1,4 @@
-export const UI_VERSION = "0.1.3";
+export const UI_VERSION = "0.1.13";
 
 const VALID_KINDS = ["Index", "Edit", "View"];
 const SORT_FIELDS = ["name", "mtime", "size"];

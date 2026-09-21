@@ -5,14 +5,18 @@
   --color-text: #14213d;
   --color-text-muted: #687280;
   --color-border: #e5e7eb;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-soft: #eff6ff;
+  --color-bauhaus-blue: #0758c9;
   --color-bauhaus-red: #ef3340;
   --color-bauhaus-yellow: #f5b82e;
+  /* Legible variant of the Bauhaus yellow for small text on light surfaces. */
+  --color-bauhaus-yellow-ink: #a97400;
+  --color-primary: var(--color-bauhaus-blue);
+  --color-primary-hover: #06449e;
+  --color-primary-soft: #e8f0fa;
   --color-action-active: var(--color-bauhaus-yellow);
   --color-success: #16a34a;
-  --color-danger: #dc2626;
+  --color-danger: var(--color-bauhaus-red);
+  --color-danger-hover: #c81e2b;
   --color-danger-soft: #fef2f2;
   --color-hover: #f3f4f6;
   --color-disabled: #9ca3af;
@@ -20,6 +24,7 @@
 
   /* 2. Typography */
   --font-ui: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-ui);
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
   --font-size-caption: 0.75rem;
   --font-size-ui: 0.875rem;
@@ -32,6 +37,7 @@
   --font-weight-bold: 700;
   --line-height-tight: 1.25;
   --line-height-ui: 1.5;
+  --tracking-caps: 0.04em;
 
   /* 3. Spacing */
   --space-1: 0.25rem;
@@ -57,19 +63,21 @@
   --size-dialog-max: 30rem;
   --size-search-max: 20rem;
 
-  /* 5. Radius */
+  /* 5. Radius — modern, restrained. */
   --radius-sm: 0.25rem;
   --radius-control: 0.375rem;
   --radius-panel: 0.5rem;
   --radius-round: 999px;
 
-  /* 6. Border */
+  /* 6. Border — neutral hairlines; colour comes from the Bauhaus accents. */
   --border-width: 1px;
   --border-default: var(--border-width) solid var(--color-border);
+  --border-control: var(--border-width) solid var(--color-border);
+  --border-strong: var(--border-width) solid var(--color-border);
   --border-focus: 2px solid var(--color-primary);
   --border-selected: 3px solid var(--color-primary);
 
-  /* 7. Shadow */
+  /* 7. Shadow — modern soft elevation. */
   --shadow-panel: 0 1px 3px rgba(20, 33, 61, 0.08);
   --shadow-menu: 0 8px 24px rgba(20, 33, 61, 0.14);
   --shadow-dialog: 0 16px 40px rgba(20, 33, 61, 0.18);
@@ -78,6 +86,7 @@
   --icon-size-sm: 1rem;
   --icon-size: 1.125rem;
   --icon-size-mobile: 1.25rem;
+  --icon-size-toolbar: 2rem;   /* mobile topbar menu button mark */
   --icon-size-file: 1.5rem;
   --icon-size-grid: 3.5rem;
   --icon-box: 1.5rem;

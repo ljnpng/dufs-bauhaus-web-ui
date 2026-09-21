@@ -17,7 +17,7 @@
   top: 0;
   z-index: var(--z-sticky);
   background: var(--color-surface);
-  border-bottom: var(--border-default);
+  border-bottom: var(--border-strong);
 }
 
 .mobile-topbar {
@@ -94,8 +94,8 @@
 }
 
 .mobile-iconbtn .icon {
-  width: var(--icon-size-mobile);
-  height: var(--icon-size-mobile);
+  width: var(--icon-size-toolbar);
+  height: var(--icon-size-toolbar);
 }
 
 /* Breadcrumb — standalone (legacy, not currently used in topbar) */
@@ -201,7 +201,7 @@
   min-height: var(--size-control);
   padding: 0 var(--space-3);
   background: var(--color-bg);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-control);
   transition: border-color var(--motion-fast) var(--motion-ease);
 }
@@ -210,8 +210,8 @@
   border-color: var(--color-primary);
 }
 
-.mobile-search__field .icon {
-  color: var(--color-text-muted);
+.mobile-search__field > .icon {
+  color: var(--color-primary);
   flex: none;
 }
 
@@ -241,13 +241,13 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-danger);
   cursor: pointer;
   transition: color var(--motion-fast) var(--motion-ease);
 }
 
 .mobile-search__clear:hover {
-  color: var(--color-text);
+  color: var(--color-danger-hover);
 }
 
 .mobile-search__clear[hidden] {
@@ -418,32 +418,6 @@
   .mobile-row__meta-mtime {
     display: inline;
   }
-}
-
-/* --------------------------------------------- topbar traffic dots menu */
-
-.mobile-traffic-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.mobile-traffic-dots span {
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-round);
-}
-
-.mobile-traffic-dots span:nth-child(1) {
-  background: var(--color-bauhaus-red);
-}
-
-.mobile-traffic-dots span:nth-child(2) {
-  background: var(--color-bauhaus-yellow);
-}
-
-.mobile-traffic-dots span:nth-child(3) {
-  background: var(--color-primary);
 }
 
 /* Toasts no longer clear a bottom nav; keep them just above the viewport edge. */

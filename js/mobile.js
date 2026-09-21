@@ -9,8 +9,8 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
-} from './core.js?ui=0.1.3';
-import { createIcon, ensureSprite } from './overlays.js?ui=0.1.3';
+} from './core.js?ui=0.1.13';
+import { createIcon, ensureSprite } from './overlays.js?ui=0.1.13';
 
 // iOS Safari only paints :active while a touch listener is attached to the
 // document, so register a no-op one to make the mobile pressed states fire.
@@ -214,7 +214,6 @@ function rowMenuItems(item, context) {
       items.push({
         id: 'download',
         label: 'Download as zip',
-        icon: 'download',
         run: () => downloadTo(`${url}?zip`),
       });
     }
@@ -222,20 +221,17 @@ function rowMenuItems(item, context) {
     items.push({
       id: 'download',
       label: 'Download',
-      icon: 'download',
       run: () => downloadTo(url),
     });
     items.push({
       id: 'view',
       label: 'View',
-      icon: 'eye',
       run: () => navigate(`${url}?view`),
     });
     if (caps.edit) {
       items.push({
         id: 'edit',
         label: 'Edit',
-        icon: 'edit',
         run: () => navigate(`${url}?edit`),
       });
     }
@@ -245,7 +241,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: 'move',
       label: 'Rename / Move',
-      icon: 'move',
       run: () => runMove(item, url, context),
     });
   }
@@ -253,7 +248,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: 'copy',
       label: 'Copy',
-      icon: 'copy',
       run: () => runCopy(item, url, context),
     });
   }
@@ -261,7 +255,6 @@ function rowMenuItems(item, context) {
     items.push({
       id: 'delete',
       label: 'Delete',
-      icon: 'delete',
       danger: true,
       run: () => runDelete(item, url, context),
     });
@@ -416,19 +409,17 @@ function openGlobalMenu(anchor, context, pickFiles) {
   const data = context.data;
   const items = [];
   if (caps.upload && typeof pickFiles === 'function') {
-    items.push({ id: 'upload', label: 'Upload', icon: 'upload', run: () => pickFiles() });
+    items.push({ id: 'upload', label: 'Upload', run: () => pickFiles() });
   }
   if (caps.create) {
     items.push({
       id: 'folder',
       label: 'New folder',
-      icon: 'folder-plus',
       run: () => runCreateFolder(context),
     });
     items.push({
       id: 'file',
       label: 'New file',
-      icon: 'file-plus',
       run: () => runCreateFile(context),
     });
   }
@@ -438,7 +429,6 @@ function openGlobalMenu(anchor, context, pickFiles) {
       items.push({
         id: 'login',
         label: 'Sign in',
-        icon: 'login',
         run: async () => {
           await api.checkAuth(true);
           window.location.reload();
@@ -449,7 +439,6 @@ function openGlobalMenu(anchor, context, pickFiles) {
     items.push({
       id: 'logout',
       label: data.user ? `Sign out (${data.user})` : 'Sign out',
-      icon: 'logout',
       run: async () => {
         try {
           await api.logout(data.user);
@@ -462,13 +451,6 @@ function openGlobalMenu(anchor, context, pickFiles) {
   }
   }
   return context.ui.menu(anchor, items);
-}
-
-function createTrafficDots() {
-  const dots = create('span', 'mobile-traffic-dots');
-  dots.setAttribute('aria-hidden', 'true');
-  for (let i = 0; i < 3; i += 1) dots.append(create('span'));
-  return dots;
 }
 
 /**
@@ -531,7 +513,7 @@ export function renderMobileShell(root, context) {
   menuButton.type = 'button';
   menuButton.setAttribute('aria-label', 'Open menu');
   menuButton.setAttribute('aria-haspopup', 'menu');
-  menuButton.append(createTrafficDots());
+  menuButton.append(createIcon('more-bauhaus'));
   menuButton.addEventListener('click', () => {
     if (globalMenuOpen) {
       if (ui && typeof ui.closeMenu === 'function') ui.closeMenu();

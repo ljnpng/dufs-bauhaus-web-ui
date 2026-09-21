@@ -102,7 +102,7 @@ svg {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-control);
   background: var(--color-surface);
-  border: var(--border-default);
+  border: var(--border-control);
   box-shadow: var(--shadow-menu);
   transform: translateY(-200%);
   transition: transform var(--motion-fast) var(--motion-ease);
@@ -143,12 +143,14 @@ svg {
   justify-content: center;
   gap: var(--space-2);
   min-height: var(--size-control);
-  padding: 0 var(--space-3);
-  border: var(--border-default);
+  padding: 0 var(--space-4);
+  border: var(--border-control);
   border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-text);
-  font-weight: var(--font-weight-medium);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   white-space: nowrap;
   transition:
@@ -170,38 +172,6 @@ svg {
   transform: translateY(var(--motion-press-offset));
 }
 
-.btn--primary {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-surface);
-}
-
-.btn--primary:hover:not(:disabled) {
-  border-color: var(--color-primary-hover);
-  background: var(--color-primary-hover);
-}
-
-.btn--primary:active:not(:disabled) {
-  border-color: var(--color-primary-hover);
-  background: var(--color-primary-hover);
-  color: var(--color-surface);
-}
-
-.btn--danger {
-  color: var(--color-danger);
-}
-
-.btn--danger:hover:not(:disabled) {
-  border-color: var(--color-danger);
-  background: var(--color-danger-soft);
-}
-
-.btn--danger:active:not(:disabled) {
-  border-color: var(--color-danger);
-  background: var(--color-danger);
-  color: var(--color-surface);
-}
-
 .btn:disabled {
   color: var(--color-disabled);
   background: var(--color-surface);
@@ -215,10 +185,10 @@ svg {
   justify-content: center;
   width: var(--size-control);
   height: var(--size-control);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-control);
   background: var(--color-surface);
-  color: var(--color-text-muted);
+  color: var(--color-text);
   transition:
     background var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease),
@@ -254,13 +224,36 @@ svg {
   background: var(--color-hover);
 }
 
+/* Bauhaus label accent: text-only controls keep their ink, but the leading
+   letter carries an accent from the red/yellow/blue trio. */
+
+.bauhaus-initial {
+  font-weight: var(--font-weight-bold);
+}
+
+.bauhaus-initial--red {
+  color: var(--color-bauhaus-red);
+}
+
+.bauhaus-initial--yellow {
+  color: var(--color-bauhaus-yellow-ink);
+}
+
+.bauhaus-initial--blue {
+  color: var(--color-bauhaus-blue);
+}
+
+.bauhaus-initial--danger {
+  color: var(--color-danger);
+}
+
 /* Form fields */
 
 .field-input {
   width: 100%;
   min-height: var(--size-control);
   padding: 0 var(--space-3);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-text);
@@ -334,6 +327,26 @@ svg {
   }
 }
 
+/* Bauhaus composition strip: a thin red/yellow/blue rule along the top of
+   every sticky header. Red, yellow and blue stay accents, never fields. */
+
+.desktop-toolbar::before,
+.mobile-header::before,
+.editor-toolbar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bauhaus-red) 0 33.333%,
+    var(--color-bauhaus-yellow) 33.333% 66.666%,
+    var(--color-bauhaus-blue) 66.666% 100%
+  );
+}
+
 /* Editor shell is shared by Edit and View kinds and across breakpoints. */
 
 body[data-mode="editor"] #app > #desktop-view {
@@ -362,7 +375,7 @@ body[data-mode="editor"] #app > #mobile-view {
   gap: var(--space-4);
   min-height: var(--size-toolbar);
   padding: 0 var(--page-gutter-mobile);
-  border-bottom: var(--border-default);
+  border-bottom: var(--border-strong);
   background: var(--color-surface);
 }
 
@@ -394,7 +407,7 @@ body[data-mode="editor"] #app > #mobile-view {
   width: 100%;
   min-height: 60vh;
   padding: var(--space-4);
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-panel);
   background: var(--color-surface);
   box-shadow: var(--shadow-panel);
@@ -409,7 +422,7 @@ body[data-mode="editor"] #app > #mobile-view {
 .editor-preview {
   width: 100%;
   height: 72vh;
-  border: var(--border-default);
+  border: var(--border-control);
   border-radius: var(--radius-panel);
   background: var(--color-surface);
   box-shadow: var(--shadow-panel);
@@ -421,7 +434,7 @@ body[data-mode="editor"] #app > #mobile-view {
   flex-direction: column;
   gap: var(--space-4);
   padding: var(--space-6);
-  border: var(--border-default);
+  border: var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--color-surface);
   box-shadow: var(--shadow-panel);
@@ -449,8 +462,7 @@ body[data-mode="editor"] #app > #mobile-view {
 .fatal__panel {
   max-width: var(--size-dialog-max);
   padding: var(--space-6);
-  border: var(--border-default);
-  border-top: var(--border-selected);
+  border: var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--color-surface);
   box-shadow: var(--shadow-dialog);
