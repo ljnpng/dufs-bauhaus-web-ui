@@ -52,11 +52,12 @@
   min-width: 0;
   color: var(--color-text);
   text-decoration: none;
-  outline: none;
 }
 
+.mobile-brand:focus,
 .mobile-brand:focus-visible {
-  outline: none;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .mobile-brand__mark {
