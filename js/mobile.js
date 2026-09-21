@@ -316,38 +316,56 @@ function renderBreadcrumb(data) {
   const prefix = rootHref(data);
   const segments = String(data.href || '/').split('/').filter(Boolean);
 
-  const home = create(
-    segments.length === 0 ? 'span' : 'a',
-    `crumb crumb--home${segments.length === 0 ? ' crumb--home-current' : ''}`,
-  );
-  if (segments.length > 0) {
-    home.href = prefix;
-    home.setAttribute('aria-label', 'Files');
-  } else {
-    home.setAttribute('aria-current', 'page');
-  }
-  home.append(createIcon('home'));
-  if (segments.length === 0) home.append(create('span', 'crumb__label', 'Files'));
-  nav.append(home);
+  // No home crumb — the brand logo already links to root.
+  // At root level the breadcrumb is empty.
+  if (segments.length === 0) return nav;
 
+  // Build full path list: [{label, href}, ...]
+  const crumbs = [];
   let path = prefix;
   segments.forEach((segment, index) => {
-    const separator = create('span', 'crumb-sep');
-    separator.setAttribute('aria-hidden', 'true');
-    separator.append(createIcon('chevron-right'));
-    nav.append(separator);
-
     path += `${encodeURIComponent(segment)}/`;
-    if (index === segments.length - 1) {
-      const current = create('span', 'crumb crumb--current', segment);
+    crumbs.push({ label: segment, href: path, last: index === segments.length - 1 });
+  });
+
+  // For deep paths (3+ segments) collapse the middle into a single "…" link
+  // pointing at the parent (second-to-last). This keeps the topbar readable
+  // without interactive expand state.
+  //   1 segment : current
+  //   2 segments: first > current
+  //   3+ segments: first > … > current   (… links to parent)
+  let visible;
+  if (crumbs.length <= 2) {
+    visible = crumbs;
+  } else {
+    const parent = crumbs[crumbs.length - 2];
+    visible = [
+      crumbs[0],
+      { label: '…', href: parent.href, ellipsis: true },
+      crumbs[crumbs.length - 1],
+    ];
+  }
+
+  visible.forEach((item, index) => {
+    if (index > 0) {
+      const sep = create('span', 'crumb-sep');
+      sep.setAttribute('aria-hidden', 'true');
+      sep.append(createIcon('chevron-right'));
+      nav.append(sep);
+    }
+
+    if (item.last) {
+      const current = create('span', 'crumb crumb--current', item.label);
       current.setAttribute('aria-current', 'page');
       nav.append(current);
     } else {
-      const link = create('a', 'crumb', segment);
-      link.href = path;
+      const link = create('a', item.ellipsis ? 'crumb crumb--ellipsis' : 'crumb', item.label);
+      link.href = item.href;
+      if (item.ellipsis) link.setAttribute('aria-label', 'Parent folders');
       nav.append(link);
     }
   });
+
   return nav;
 }
 
@@ -374,69 +392,6 @@ function renderSearch(query) {
     navigate(value ? `${baseUrl()}?q=${encodeURIComponent(value)}` : baseUrl());
   });
   return form;
-}
-
-function createSearchControl(query) {
-  const control = create('div', 'mobile-search-control');
-  const search = renderSearch(query);
-  const button = create('button', 'mobile-iconbtn mobile-search-toggle');
-  button.type = 'button';
-  const initiallyOpen = Boolean(query.q);
-  search.hidden = !initiallyOpen;
-  button.setAttribute('aria-label', initiallyOpen ? 'Close search' : 'Open search');
-  button.setAttribute('aria-expanded', String(initiallyOpen));
-  const setIcon = (open) => {
-    button.replaceChildren(createIcon(open ? 'close' : 'search'));
-  };
-  setIcon(initiallyOpen);
-  const input = search.querySelector('input');
-  let collapseTimer = null;
-  const setOpen = (open, focus = false) => {
-    if (collapseTimer) {
-      clearTimeout(collapseTimer);
-      collapseTimer = null;
-    }
-    search.classList.remove('is-collapsing');
-    search.hidden = !open;
-    button.setAttribute('aria-expanded', String(open));
-    button.setAttribute('aria-label', open ? 'Close search' : 'Open search');
-    setIcon(open);
-    if (focus) input?.focus();
-  };
-  const closeSearch = () => {
-    // If a search filter is active, closing also clears it; otherwise the
-    // user would be left on a filtered list with no visible way to reset.
-    if (query.q) {
-      navigate(baseUrl());
-      return;
-    }
-    // Discard any unsubmitted draft so reopening starts clean.
-    if (input) input.value = '';
-    // Fade the field out first; hide it once the transition finishes.
-    search.classList.add('is-collapsing');
-    collapseTimer = setTimeout(() => {
-      collapseTimer = null;
-      setOpen(false);
-      button.focus();
-    }, 130);
-  };
-
-  button.addEventListener('click', () => {
-    const open = button.getAttribute('aria-expanded') === 'true';
-    if (open) {
-      closeSearch();
-      return;
-    }
-    setOpen(true, true);
-  });
-  input?.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    event.preventDefault();
-    closeSearch();
-  });
-
-  control.append(search, button);
-  return control;
 }
 
 function openGlobalMenu(anchor, context, pickFiles) {
@@ -561,11 +516,11 @@ export function renderMobileIndex(root, context) {
   });
 
   const topActions = create('div', 'mobile-topbar__actions');
-  if (capabilities.search) topActions.append(createSearchControl(query));
   topActions.append(menuButton);
 
-  topbar.append(brand, topActions);
-  header.append(topbar, renderBreadcrumb(data));
+  topbar.append(brand, renderBreadcrumb(data), topActions);
+  header.append(topbar);
+  if (capabilities.search) header.append(renderSearch(query));
 
   shell.append(header);
 

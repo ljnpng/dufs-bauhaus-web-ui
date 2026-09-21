@@ -23,10 +23,17 @@
 .mobile-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2);
   min-height: var(--size-toolbar);
   padding: 0 var(--page-gutter-mobile);
+}
+
+/* Breadcrumb sits between brand and actions in the topbar row */
+.mobile-topbar .mobile-breadcrumb {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .mobile-topbar__actions {
@@ -37,12 +44,6 @@
   gap: var(--space-1);
 }
 
-.mobile-search-control {
-  display: flex;
-  flex: 0 1 min(18rem, 58vw);
-  align-items: center;
-  min-width: 0;
-}
 
 .mobile-brand {
   display: inline-flex;
@@ -91,7 +92,7 @@
   height: var(--icon-size-mobile);
 }
 
-/* Breadcrumb */
+/* Breadcrumb — standalone (legacy, not currently used in topbar) */
 
 .mobile-breadcrumb {
   display: flex;
@@ -125,6 +126,21 @@
     transform var(--motion-fast) var(--motion-ease);
 }
 
+/* Breadcrumb inside topbar — compact, no extra hit target height */
+
+.mobile-topbar .mobile-breadcrumb .crumb {
+  min-height: 0;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-caption);
+}
+
+.mobile-topbar .mobile-breadcrumb .crumb--current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 .mobile-breadcrumb a.crumb:hover {
   color: var(--color-text);
   background: var(--color-hover);
@@ -135,27 +151,14 @@
   transform: scale(0.97);
 }
 
-.mobile-breadcrumb .crumb--home {
-  color: var(--color-primary);
-}
-
-.mobile-breadcrumb .crumb--home-current {
-  gap: var(--space-2);
-  color: var(--color-text-muted);
-  cursor: default;
-}
-
-.mobile-breadcrumb .crumb--home-current .icon {
-  color: var(--color-primary);
-}
-
-.mobile-breadcrumb .crumb__label {
-  font-weight: var(--font-weight-semibold);
-}
-
 .mobile-breadcrumb .crumb--current {
   color: var(--color-text);
   font-weight: var(--font-weight-semibold);
+}
+
+.mobile-breadcrumb .crumb--ellipsis {
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
 }
 
 .mobile-breadcrumb .crumb-sep {
@@ -169,60 +172,31 @@
   height: var(--icon-size-sm);
 }
 
-/* Search */
+/* Search — always visible, persistent, no toggle */
 
 .mobile-search {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
-  animation: mobile-search-in var(--motion-panel) var(--motion-ease);
-}
-
-@keyframes mobile-search-in {
-  from {
-    opacity: 0;
-    transform: translateX(var(--space-2));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.mobile-search.is-collapsing {
-  opacity: 0;
-  transition: opacity var(--motion-fast) var(--motion-ease);
+  padding: 0 var(--page-gutter-mobile) var(--space-2);
 }
 
 .mobile-search__field {
   display: flex;
-  flex: 1;
   align-items: center;
   gap: var(--space-2);
-  min-width: 0;
-  min-height: var(--size-primary);
+  min-height: var(--size-control);
   padding: 0 var(--space-3);
   background: var(--color-bg);
   border: var(--border-default);
   border-radius: var(--radius-control);
-  transition:
-    border-color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease);
-}
-
-.mobile-search[hidden] {
-  display: none;
+  transition: border-color var(--motion-fast) var(--motion-ease);
 }
 
 .mobile-search__field:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-soft);
 }
 
 .mobile-search__field .icon {
   color: var(--color-text-muted);
+  flex: none;
 }
 
 .mobile-search__input {
@@ -241,8 +215,7 @@
   color: var(--color-text-muted);
 }
 
-/* Hide the native search-field cancel button: the topbar toggle is the
-   single close control, so the browser must not render a second one. */
+/* Suppress native browser search decorations */
 .mobile-search__input::-webkit-search-cancel-button,
 .mobile-search__input::-webkit-search-decoration {
   display: none;
@@ -441,9 +414,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-row,
-  .mobile-search__field,
-  .mobile-search {
-    animation-duration: 0ms !important;
+  .mobile-search__field {
     transition-duration: 0ms !important;
   }
 
