@@ -286,22 +286,6 @@ function renderToolbar(data, query, context) {
 
   const actions = create("div", "toolbar-actions");
 
-  if (caps.upload) {
-    const uploadBtn = create("button", "btn btn--primary");
-    uploadBtn.type = "button";
-    uploadBtn.append(bauhausLabel("Upload"));
-    uploadBtn.addEventListener("click", () => pickFiles(context));
-    actions.append(uploadBtn);
-  }
-
-  if (caps.archive) {
-    actions.append(
-      iconButton("download", "Download folder as zip", () => downloadTo(`${baseUrl()}?zip`)),
-    );
-  }
-
-  actions.append(iconButton("refresh", "Refresh", () => window.location.reload()));
-
   if (caps.login) {
     const login = create("button", "btn");
     login.type = "button";
@@ -318,6 +302,13 @@ function renderToolbar(data, query, context) {
   }
 
   const menuItems = [];
+  if (caps.upload) {
+    menuItems.push({
+      id: "upload",
+      label: "Upload",
+      run: () => pickFiles(context),
+    });
+  }
   if (caps.create) {
     menuItems.push({
       id: "new-folder",
