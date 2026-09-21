@@ -210,24 +210,6 @@ body.ui-no-scroll {
   color: var(--color-text);
 }
 
-.ui-dialog__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--density-hit-target);
-  height: var(--density-hit-target);
-  color: var(--color-text-muted);
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius-control);
-  cursor: pointer;
-}
-
-.ui-dialog__close:hover {
-  color: var(--color-text);
-  background: var(--color-hover);
-}
-
 .ui-dialog__body {
   padding: var(--space-6);
   overflow-y: auto;

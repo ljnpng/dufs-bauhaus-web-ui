@@ -339,7 +339,6 @@ export function createUiServices(root, context) {
       footer = null,
       initialFocus = null,
       onDismiss = null,
-      closeLabel = 'Close',
       dismissOnBackdrop = true,
     } = options;
 
@@ -353,17 +352,11 @@ export function createUiServices(root, context) {
       'aria-labelledby': titleId,
     });
 
-    const closeButton = el(
-      'button',
-      { type: 'button', class: 'ui-dialog__close', 'aria-label': closeLabel },
-      createIcon('close'),
-    );
     dialog.appendChild(
       el(
         'div',
         { class: 'ui-dialog__header' },
         el('h2', { class: 'ui-dialog__title', id: titleId, text: title }),
-        closeButton,
       ),
     );
     dialog.appendChild(el('div', { class: 'ui-dialog__body' }, body));
@@ -405,7 +398,6 @@ export function createUiServices(root, context) {
       }
     }
 
-    closeButton.addEventListener('click', close);
     if (dismissOnBackdrop) backdrop.addEventListener('click', close);
     document.addEventListener('keydown', onKeydown, true);
 
