@@ -585,9 +585,8 @@ export function updateMobileContent(contentEl, context, refs) {
   }
 
   // ── sync search input value ─────────────────────────────────────────────
-  if (refs && refs.searchInputEl) {
-    refs.searchInputEl.value = (query && query.q) || '';
-  }
+  // Search input value is owned by the user — only cleared on explicit submit
+  // or clear action, never on directory navigation.
 
   // ── clear and re-render content ─────────────────────────────────────────
   contentEl.textContent = '';

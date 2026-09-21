@@ -670,11 +670,8 @@ export function updateDesktopToolbar(toolbarEl, context) {
     toolbarEl.replaceChild(newBreadcrumb, oldBreadcrumb);
   }
 
-  // Sync search input value
-  const searchInput = toolbarEl.querySelector(".toolbar-search .field-input");
-  if (searchInput) {
-    searchInput.value = query.q || "";
-  }
+  // Search input value is owned by the user — only cleared on explicit submit
+  // or clear action, never on directory navigation.
 }
 
 /**
