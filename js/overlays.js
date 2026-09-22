@@ -640,8 +640,7 @@ export function createUiServices(root, context) {
       field.append(input, errorEl);
 
       const form = el('form', { class: 'ui-dialog__form', novalidate: true }, field);
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
+      const submit = () => {
         const trimmed = input.value.trim();
         if (required && !trimmed) {
           errorEl.textContent = 'A value is required.';
@@ -650,6 +649,10 @@ export function createUiServices(root, context) {
           return;
         }
         finish(trimmed);
+      };
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        submit();
       });
 
       const footer = el('div', { class: 'ui-dialog__footer' });
@@ -659,11 +662,14 @@ export function createUiServices(root, context) {
         bauhausLabel(cancelLabel || cancelText || 'Cancel', 'yellow'),
       );
       cancel.addEventListener('click', () => finish(null));
+      // The confirm button lives in the dialog footer, outside the <form>, so
+      // it cannot rely on native submit; wire it to the same handler.
       const ok = el(
         'button',
-        { type: 'submit', class: 'ui-btn ui-btn--primary' },
+        { type: 'button', class: 'ui-btn ui-btn--primary' },
         bauhausLabel(confirmLabel || confirmText || 'OK'),
       );
+      ok.addEventListener('click', submit);
       footer.append(cancel, ok);
 
       close = openDialog({

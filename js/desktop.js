@@ -9,6 +9,7 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
+  registerBreadcrumb,
 } from "./core.js?ui=0.1.14";
 import { bauhausLabel, createIcon } from "./overlays.js?ui=0.1.14";
 
@@ -167,47 +168,57 @@ function renderBreadcrumb(data) {
     crumbs.push({ label: segment, href: path, last: index === segments.length - 1 });
   });
 
-  // Deep paths (3+ segments) collapse the middle into a "…" link pointing at
-  // the parent so the trail stays readable without expand state.
-  //   1 segment : current
-  //   2 segments: first > current
-  //   3+ segments: first > … > current
-  let visible;
-  if (crumbs.length <= 2) {
-    visible = crumbs;
-  } else {
-    const parent = crumbs[crumbs.length - 2];
-    visible = [
-      crumbs[0],
-      { label: "\u2026", href: parent.href, ellipsis: true },
-      crumbs[crumbs.length - 1],
-    ];
-  }
+  // The full trail is rendered up front; fitBreadcrumb() only collapses the
+  // middle into a "…" when the toolbar is too narrow to show every crumb.
+  const slots = crumbs.map((item) => {
+    // Each crumb carries its own separator so hiding a crumb hides its
+    // leading divider too. The separator also anchors the trail to the brand
+    // mark that acts as home.
+    const group = create("span", "breadcrumb__group");
+    group.dataset.href = item.href;
 
-  visible.forEach((item) => {
-    // Always prepend a separator — the leading one anchors the trail to the
-    // brand mark that acts as home.
     const sep = create("span", "breadcrumb__separator");
     sep.setAttribute("aria-hidden", "true");
     sep.append(createIcon("chevron-right"));
-    nav.append(sep);
+    group.append(sep);
 
     if (item.last) {
       const current = create("span", "breadcrumb__current", item.label);
       current.setAttribute("aria-current", "page");
-      nav.append(current);
+      group.append(current);
     } else {
-      const link = create(
-        "a",
-        item.ellipsis ? "breadcrumb__link breadcrumb__link--ellipsis" : "breadcrumb__link",
-        item.label,
-      );
+      const link = create("a", "breadcrumb__link", item.label);
       link.href = item.href;
-      if (item.ellipsis) link.setAttribute("aria-label", "Parent folders");
-      nav.append(link);
+      group.append(link);
+    }
+    return group;
+  });
+
+  const ellipsis = renderBreadcrumbEllipsis(crumbs[0].href);
+  slots.forEach((slot, index) => {
+    nav.append(slot);
+    if (index === 0) {
+      nav.append(ellipsis);
     }
   });
+
+  registerBreadcrumb(slots, ellipsis);
   return nav;
+}
+
+function renderBreadcrumbEllipsis(href) {
+  const group = create("span", "breadcrumb__group breadcrumb__group--ellipsis");
+  group.hidden = true;
+
+  const sep = create("span", "breadcrumb__separator");
+  sep.setAttribute("aria-hidden", "true");
+  sep.append(createIcon("chevron-right"));
+
+  const link = create("a", "breadcrumb__link breadcrumb__link--ellipsis", "\u2026");
+  link.href = href;
+  link.setAttribute("aria-label", "Parent folders");
+  group.append(sep, link);
+  return group;
 }
 
 function renderBrand(data) {

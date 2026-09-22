@@ -611,3 +611,129 @@ export function createRouter(onNavigate) {
 
   return { init, push, replace, destroy };
 }
+
+const breadcrumbTrackers = new Set();
+let breadcrumbResizeBound = false;
+
+function scheduleBreadcrumbFit(tracker) {
+  if (tracker.frame) {
+    return;
+  }
+  tracker.frame = requestAnimationFrame(() => {
+    tracker.frame = 0;
+    const first = tracker.slots[0];
+    if (!first || !first.isConnected) {
+      breadcrumbTrackers.delete(tracker);
+      return;
+    }
+    tracker.fit();
+  });
+}
+
+function onBreadcrumbResize() {
+  breadcrumbTrackers.forEach(scheduleBreadcrumbFit);
+}
+
+// Register a breadcrumb trail so it re-fits when the viewport changes. `slots`
+// are the per-crumb wrappers (each tagged with `dataset.href`); `ellipsis` is
+// the collapse marker that sits between the leading crumb and the visible tail.
+export function registerBreadcrumb(slots, ellipsis) {
+  const tracker = {
+    slots,
+    frame: 0,
+    fit: () => fitBreadcrumb(slots, ellipsis),
+  };
+  breadcrumbTrackers.forEach((entry) => {
+    if (!entry.slots[0] || !entry.slots[0].isConnected) {
+      breadcrumbTrackers.delete(entry);
+    }
+  });
+  breadcrumbTrackers.add(tracker);
+  if (!breadcrumbResizeBound) {
+    breadcrumbResizeBound = true;
+    window.addEventListener("resize", onBreadcrumbResize);
+  }
+  scheduleBreadcrumbFit(tracker);
+}
+
+// Keep the leading crumb even when the rest would shrink the current name
+// below this many pixels.
+const BREADCRUMB_HEADROOM = 56;
+
+// Show every crumb when the container is wide enough; otherwise collapse the
+// hidden middle into the ellipsis, keeping the leading crumb and the longest
+// trailing tail that fits.
+export function fitBreadcrumb(slots, ellipsis) {
+  const container = slots[0] && slots[0].parentElement;
+  if (!container || slots.length === 0) {
+    return;
+  }
+
+  const count = slots.length;
+  const apply = (visible, href) => {
+    slots.forEach((slot, index) => {
+      slot.hidden = !visible.has(index);
+    });
+    if (visible.has(-1)) {
+      const link = ellipsis.querySelector("a");
+      if (link && href) {
+        link.href = href;
+      }
+      ellipsis.hidden = false;
+    } else {
+      ellipsis.hidden = true;
+    }
+  };
+
+  // Measure the natural width of a candidate set. Runs while `is-measuring`
+  // pins every group to its content width, so the current crumb does not
+  // shrink and hide how much room the trail really needs.
+  const gap = Number.parseFloat(getComputedStyle(container).columnGap) || 0;
+  const measure = (visible) => {
+    apply(visible, null);
+    let total = 0;
+    let shown = 0;
+    slots.forEach((slot, index) => {
+      if (visible.has(index)) {
+        total += slot.getBoundingClientRect().width;
+        shown += 1;
+      }
+    });
+    if (visible.has(-1)) {
+      total += ellipsis.getBoundingClientRect().width;
+      shown += 1;
+    }
+    return total + gap * Math.max(0, shown - 1);
+  };
+  const fits = (visible) => measure(visible) <= container.clientWidth + 1;
+
+  const all = new Set(slots.map((_, index) => index));
+  container.classList.add("is-measuring");
+
+  let chosen;
+  if (fits(all) || count <= 2) {
+    chosen = { visible: all, href: null };
+  } else {
+    for (let keep = count - 2; keep >= 1 && !chosen; keep -= 1) {
+      const href = slots[count - keep - 1].dataset.href;
+      const visible = new Set([0, -1]);
+      for (let index = count - keep; index < count; index += 1) {
+        visible.add(index);
+      }
+      if (fits(visible)) {
+        chosen = { visible, href };
+      }
+    }
+    if (!chosen) {
+      const href = slots[count - 2].dataset.href;
+      const keepFirst = measure(new Set([0, -1])) + BREADCRUMB_HEADROOM <= container.clientWidth + 1;
+      chosen = {
+        visible: keepFirst ? new Set([0, -1, count - 1]) : new Set([-1, count - 1]),
+        href,
+      };
+    }
+  }
+
+  container.classList.remove("is-measuring");
+  apply(chosen.visible, chosen.href);
+}

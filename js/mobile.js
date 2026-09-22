@@ -9,6 +9,7 @@ import {
   isSymlink,
   joinAbsolutePath,
   joinEntryUrl,
+  registerBreadcrumb,
 } from './core.js?ui=0.1.14';
 import { createIcon, ensureSprite } from './overlays.js?ui=0.1.14';
 
@@ -310,45 +311,57 @@ function renderBreadcrumb(data) {
     crumbs.push({ label: segment, href: path, last: index === segments.length - 1 });
   });
 
-  // For deep paths (3+ segments) collapse the middle into a single "…" link
-  // pointing at the parent (second-to-last). This keeps the topbar readable
-  // without interactive expand state.
-  //   1 segment : current
-  //   2 segments: first > current
-  //   3+ segments: first > … > current   (… links to parent)
-  let visible;
-  if (crumbs.length <= 2) {
-    visible = crumbs;
-  } else {
-    const parent = crumbs[crumbs.length - 2];
-    visible = [
-      crumbs[0],
-      { label: '…', href: parent.href, ellipsis: true },
-      crumbs[crumbs.length - 1],
-    ];
-  }
+  // The full trail is rendered up front; fitBreadcrumb() only collapses the
+  // middle into a single "…" when the topbar is too narrow to show every crumb.
+  const slots = crumbs.map((item) => {
+    // Each crumb carries its own separator so hiding a crumb hides its leading
+    // divider too. The separator also anchors the trail to the brand logo
+    // (which acts as home).
+    const group = create('span', 'crumb-group');
+    group.dataset.href = item.href;
 
-  visible.forEach((item, index) => {
-    // Always prepend a separator — the leading one anchors the breadcrumb
-    // visually to the brand logo (which acts as home).
     const sep = create('span', 'crumb-sep');
     sep.setAttribute('aria-hidden', 'true');
     sep.append(createIcon('chevron-right'));
-    nav.append(sep);
+    group.append(sep);
 
     if (item.last) {
       const current = create('span', 'crumb crumb--current', item.label);
       current.setAttribute('aria-current', 'page');
-      nav.append(current);
+      group.append(current);
     } else {
-      const link = create('a', item.ellipsis ? 'crumb crumb--ellipsis' : 'crumb', item.label);
+      const link = create('a', 'crumb', item.label);
       link.href = item.href;
-      if (item.ellipsis) link.setAttribute('aria-label', 'Parent folders');
-      nav.append(link);
+      group.append(link);
+    }
+    return group;
+  });
+
+  const ellipsis = renderBreadcrumbEllipsis(crumbs[0].href);
+  slots.forEach((slot, index) => {
+    nav.append(slot);
+    if (index === 0) {
+      nav.append(ellipsis);
     }
   });
 
+  registerBreadcrumb(slots, ellipsis);
   return nav;
+}
+
+function renderBreadcrumbEllipsis(href) {
+  const group = create('span', 'crumb-group crumb-group--ellipsis');
+  group.hidden = true;
+
+  const sep = create('span', 'crumb-sep');
+  sep.setAttribute('aria-hidden', 'true');
+  sep.append(createIcon('chevron-right'));
+
+  const link = create('a', 'crumb crumb--ellipsis', '\u2026');
+  link.href = href;
+  link.setAttribute('aria-label', 'Parent folders');
+  group.append(sep, link);
+  return group;
 }
 
 function renderSearch(query) {

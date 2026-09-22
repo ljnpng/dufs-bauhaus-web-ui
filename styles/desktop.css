@@ -112,6 +112,26 @@
     height: var(--icon-size-sm);
   }
 
+  .breadcrumb__group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  /* Only the current crumb may shrink, so a long name truncates instead of
+     pushing the whole trail out of view. */
+  .breadcrumb__group:last-child {
+    flex: 0 1 auto;
+  }
+
+  /* During measurement every crumb keeps its natural width so the trail is
+     measured at its true full size. */
+  .breadcrumb.is-measuring .breadcrumb__group {
+    flex: 0 0 auto;
+  }
+
   .toolbar-search {
     display: flex;
     flex: 0 1 var(--size-search-max);

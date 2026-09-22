@@ -134,7 +134,8 @@
 
 /* Breadcrumb inside topbar — compact, no extra hit target height */
 
-.mobile-topbar .mobile-breadcrumb {
+.mobile-topbar .mobile-breadcrumb,
+.mobile-topbar .mobile-breadcrumb .crumb-group {
   gap: 0;
 }
 
@@ -186,6 +187,26 @@
 .mobile-breadcrumb .crumb-sep .icon {
   width: var(--icon-size-sm);
   height: var(--icon-size-sm);
+}
+
+.mobile-breadcrumb .crumb-group {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* Only the current crumb may shrink, so a long name truncates instead of
+   pushing the whole trail out of view. */
+.mobile-breadcrumb .crumb-group:last-child {
+  flex: 0 1 auto;
+}
+
+/* During measurement every crumb keeps its natural width so the trail is
+   measured at its true full size. */
+.mobile-breadcrumb.is-measuring .crumb-group {
+  flex: 0 0 auto;
 }
 
 /* Search — always visible, persistent, no toggle */
